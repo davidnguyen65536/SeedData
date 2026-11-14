@@ -1,0 +1,22 @@
+Copyright (c) 2026 Team SeedData
+(David Nguyen, Johanna Josodipuro, Shaf Tabeeb, Andre Baruah)
+
+All rights reserved.
+
+This repository is published so that judges, mentors and the public can view
+and evaluate the SeedData entry to the NASA Space Apps Challenge 2026
+(Field Shift: Adapting Farms with NASA Data). You may view the source code and
+run it locally for that purpose.
+
+No other licence is granted. You may not copy, modify, distribute, sublicense
+or use this software or its documentation, in whole or in part, for any other
+purpose without prior written permission from Team SeedData.
+
+Third-party components keep their own licences:
+  - Leaflet (app/vendor/leaflet/) - BSD-2-Clause, see app/vendor/leaflet/LICENSE
+  - Data from NASA, ORNL DAAC, Queensland Government (SILO) and CSIRO/TERN is
+    subject to each provider's terms; see docs/data-sources.md.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. SCORES AND EXPLANATIONS ARE INDICATIVE AND ARE NOT AGRONOMIC,
+FINANCIAL OR PROFESSIONAL ADVICE.

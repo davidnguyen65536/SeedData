@@ -1,0 +1,30 @@
+{
+  "note": "Draft crop traits on simple 1 (low) to 3 (high) scales, from general southern-NSW agronomy. Every value must be checked against the NSW DPI Winter Crop Variety Sowing Guide and GRDC GrowNotes before use; see docs/methodology.md.",
+  "status": "draft - to be confirmed",
+  "traits": {
+    "water_use": "Seasonal water use, 1 low to 3 high",
+    "frost_sensitivity": "Yield loss risk from frost at flowering and early grain or pod fill, 1 low to 3 high",
+    "heat_sensitivity": "Yield loss risk from heat (32 C and above) at flowering and grain fill, 1 low to 3 high",
+    "ground_cover": "How well the crop and its residue keep the soil covered across the year, 1 low to 3 high",
+    "n_fixing": "Legume that fixes nitrogen",
+    "cereal": "Cereal (hosts the same root and leaf diseases as wheat)",
+    "perennial": "Lives for more than one year",
+    "livestock": "Needs livestock to earn income (grazed)",
+    "market": "Main product group, used to count how many different markets the rotation sells into"
+  },
+  "crops": {
+    "wheat":     {"label": "Wheat",       "water_use": 2, "frost_sensitivity": 2, "heat_sensitivity": 2, "ground_cover": 2, "n_fixing": false, "cereal": true,  "perennial": false, "livestock": false, "market": "cereal grain"},
+    "barley":    {"label": "Barley",      "water_use": 2, "frost_sensitivity": 2, "heat_sensitivity": 2, "ground_cover": 2, "n_fixing": false, "cereal": true,  "perennial": false, "livestock": false, "market": "cereal grain"},
+    "canola":    {"label": "Canola",      "water_use": 2, "frost_sensitivity": 2, "heat_sensitivity": 3, "ground_cover": 2, "n_fixing": false, "cereal": false, "perennial": false, "livestock": false, "market": "oilseed"},
+    "field_pea": {"label": "Field pea",   "water_use": 1, "frost_sensitivity": 3, "heat_sensitivity": 2, "ground_cover": 1, "n_fixing": true,  "cereal": false, "perennial": false, "livestock": false, "market": "pulse"},
+    "chickpea":  {"label": "Chickpea",    "water_use": 1, "frost_sensitivity": 3, "heat_sensitivity": 2, "ground_cover": 1, "n_fixing": true,  "cereal": false, "perennial": false, "livestock": false, "market": "pulse"},
+    "lupin":     {"label": "Lupin",       "water_use": 2, "frost_sensitivity": 2, "heat_sensitivity": 2, "ground_cover": 1, "n_fixing": true,  "cereal": false, "perennial": false, "livestock": false, "market": "pulse"},
+    "lucerne":   {"label": "Lucerne pasture", "water_use": 3, "frost_sensitivity": 1, "heat_sensitivity": 1, "ground_cover": 3, "n_fixing": true, "cereal": false, "perennial": true, "livestock": true, "market": "livestock"},
+    "subclover": {"label": "Sub-clover pasture", "water_use": 2, "frost_sensitivity": 1, "heat_sensitivity": 2, "ground_cover": 2, "n_fixing": true, "cereal": false, "perennial": false, "livestock": true, "market": "livestock"}
+  },
+  "strategies": [
+    {"id": "current", "label": "Current rotation", "why": "Your rotation today, the baseline every other option is compared with.", "rotation": "current"},
+    {"id": "legume", "label": "Legume break", "why": "Replaces the last wheat year with a pulse that fixes nitrogen and breaks cereal disease cycles.", "rotation": ["wheat", "canola", "wheat", "field_pea"]},
+    {"id": "pasture", "label": "Pasture phase", "why": "Two years of lucerne pasture to rebuild soil cover and organic matter, grazed by livestock.", "rotation": ["wheat", "canola", "lucerne", "lucerne"]}
+  ]
+}

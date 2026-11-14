@@ -1,0 +1,90 @@
+<!doctype html>
+<!-- Copyright (c) 2026 Team SeedData (David Nguyen, Johanna Josodipuro, Shaf Tabeeb, Andre Baruah).
+     Built for the NASA Space Apps Challenge 2026. See LICENSE for terms of use. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SeedData – crop rotation choices backed by NASA data</title>
+  <meta name="description" content="Compare crop rotations for a paddock using NASA Earth observations and Australian data.">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>SeedData</h1>
+      <p class="tag">Compare crop rotations for your paddock, backed by NASA Earth observations</p>
+    </div>
+    <a class="about-link" href="#about">How it works</a>
+  </header>
+
+  <main class="layout">
+    <section class="left">
+      <div id="map" aria-label="Map of pilot paddocks"></div>
+
+      <div class="panel" id="paddock-panel">
+        <h2 id="paddock-name">Pick a paddock on the map</h2>
+        <p class="muted" id="paddock-sub"></p>
+        <div class="facts" id="paddock-facts"></div>
+        <div class="charts">
+          <figure><figcaption>Average rain by month (mm), NASA POWER</figcaption><div id="chart-rain"></div></figure>
+          <figure><figcaption>Average greenness (NDVI) by month, MODIS; bare below 0.25</figcaption><div id="chart-ndvi"></div></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="right">
+      <div class="panel">
+        <h2>What matters to you?</h2>
+        <div id="sliders" class="sliders"></div>
+        <label class="check"><input type="checkbox" id="livestock"> I run sheep or cattle</label>
+        <div class="current">
+          <p class="label">Your current rotation (years 1–4)</p>
+          <div id="current-rotation" class="rot-select"></div>
+        </div>
+      </div>
+
+      <div id="cards" class="cards"></div>
+
+      <div class="panel" id="gaps-panel">
+        <h3>What the data can't tell you</h3>
+        <ul id="gaps"></ul>
+      </div>
+    </section>
+  </main>
+
+  <section class="panel about" id="about">
+    <h2>How it works</h2>
+    <ol>
+      <li><b>Collect.</b> Ten years (2016–2025) of NASA POWER daily weather and soil wetness, and MODIS NDVI greenness, for each paddock. Optional: SMAP soil moisture and SRTM slope via NASA AppEEARS, SILO rainfall, soil values from the Soil and Landscape Grid of Australia.</li>
+      <li><b>Summarise.</b> Frost days at flowering, hot days at grain fill, growing-season rain and how much it varies, heavy-rain days, months the paddock is bare.</li>
+      <li><b>Score.</b> Simple, published rules score each rotation from 0 to 5 for each priority, weighted by your sliders. See the methodology in the project repository.</li>
+      <li><b>Explain.</b> Every number in an explanation comes from a numbered fact with its source. An AI model can write the wording, but a checker rejects any number that isn't one of the facts.</li>
+    </ol>
+    <p class="muted">SeedData supports your judgment and local agronomic advice; it does not replace them. Scores are indicative, not field trial results.</p>
+    <p class="muted" id="data-stamp"></p>
+  </section>
+
+  <footer class="foot">
+    Data: NASA POWER, MODIS MOD13Q1 (via ORNL DAAC), with optional SMAP, SRTM, SILO and Soil and Landscape Grid of Australia. Map © OpenStreetMap contributors.
+    Built for the NASA Space Apps Challenge 2026 (Field Shift). Not affiliated with or endorsed by NASA.<br>© 2026 Team SeedData. All rights reserved.
+  </footer>
+
+  <dialog id="explain-dialog">
+    <form method="dialog">
+      <h3 id="explain-title"></h3>
+      <p id="explain-text"></p>
+      <details>
+        <summary>Facts behind this explanation</summary>
+        <table id="explain-facts"></table>
+      </details>
+      <p class="muted" id="explain-meta"></p>
+      <button value="close">Close</button>
+    </form>
+  </dialog>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

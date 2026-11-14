@@ -1,0 +1,15 @@
+{
+  "name": "seeddata",
+  "private": true,
+  "type": "module",
+  "description": "Crop rotation decision support for Australian farms using NASA Earth observations (NASA Space Apps 2026, Field Shift)",
+  "scripts": {
+    "test": "node --test app/tests/scoring.test.mjs",
+    "start": "python -m http.server 8000 -d app"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Team SeedData",
+  "license": "SEE LICENSE IN LICENSE"
+}

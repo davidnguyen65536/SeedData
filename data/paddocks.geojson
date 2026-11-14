@@ -1,0 +1,59 @@
+{
+  "type": "FeatureCollection",
+  "name": "pilot_paddocks",
+  "description": "Pilot paddocks in the Riverina, NSW. Locations are approximate cropping-land sites chosen for the prototype; replace with real paddock boundaries. Soil fields are filled by hand from the Soil and Landscape Grid of Australia (leave null if unknown).",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "coolamon",
+        "name": "Paddock near Coolamon",
+        "region": "Riverina, NSW",
+        "current_rotation": ["wheat", "canola", "wheat", "wheat"],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {"type": "Polygon", "coordinates": [[[147.240, -34.846], [147.250, -34.846], [147.250, -34.854], [147.240, -34.854], [147.240, -34.846]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "junee",
+        "name": "Paddock near Junee",
+        "region": "Riverina, NSW",
+        "current_rotation": ["wheat", "canola", "wheat", "wheat"],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {"type": "Polygon", "coordinates": [[[147.545, -34.826], [147.555, -34.826], [147.555, -34.834], [147.545, -34.834], [147.545, -34.826]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "lockhart",
+        "name": "Paddock near Lockhart",
+        "region": "Riverina, NSW",
+        "current_rotation": ["wheat", "canola", "wheat", "wheat"],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {"type": "Polygon", "coordinates": [[[146.755, -35.196], [146.765, -35.196], [146.765, -35.204], [146.755, -35.204], [146.755, -35.196]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "temora",
+        "name": "Paddock near Temora",
+        "region": "Riverina, NSW",
+        "current_rotation": ["wheat", "canola", "wheat", "wheat"],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {"type": "Polygon", "coordinates": [[[147.485, -34.466], [147.495, -34.466], [147.495, -34.474], [147.485, -34.474], [147.485, -34.466]]]}
+    }
+  ]
+}

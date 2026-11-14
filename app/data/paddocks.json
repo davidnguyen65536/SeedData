@@ -1,0 +1,537 @@
+{
+ "generated": "2026-11-14",
+ "paddocks": [
+  {
+   "id": "coolamon",
+   "name": "Paddock near Coolamon",
+   "region": "Riverina, NSW",
+   "center": [
+    -34.85,
+    147.245
+   ],
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       147.24,
+       -34.846
+      ],
+      [
+       147.25,
+       -34.846
+      ],
+      [
+       147.25,
+       -34.854
+      ],
+      [
+       147.24,
+       -34.854
+      ],
+      [
+       147.24,
+       -34.846
+      ]
+     ]
+    ]
+   },
+   "current_rotation": [
+    "wheat",
+    "canola",
+    "wheat",
+    "wheat"
+   ],
+   "features": {
+    "years": "2016–2025",
+    "n_years": 10,
+    "annual_rain_mm": 577.0,
+    "gs_rain_mm": 277.0,
+    "gs_rain_min_mm": 145.0,
+    "gs_rain_cv_pct": 46.0,
+    "frost_days_aug_oct": 8.4,
+    "heat_days_oct_nov": 5.4,
+    "heavy_rain_days": 2.0,
+    "sowing_soil_wetness": 0.4,
+    "ndvi_years": "2016–2025",
+    "bare_months_per_year": 1.2,
+    "ndvi_peak_mean": 0.8
+   },
+   "monthly": {
+    "rain_mm": [
+     73.0,
+     36.0,
+     59.0,
+     31.0,
+     35.0,
+     41.0,
+     37.0,
+     35.0,
+     39.0,
+     59.0,
+     75.0,
+     57.0
+    ],
+    "frost_days": [
+     0.0,
+     0.0,
+     0.0,
+     0.1,
+     1.4,
+     7.9,
+     8.3,
+     6.9,
+     1.5,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "heat_days": [
+     18.0,
+     12.3,
+     7.5,
+     0.5,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.1,
+     0.8,
+     4.6,
+     12.5
+    ],
+    "soil_wetness": [
+     0.36,
+     0.34,
+     0.36,
+     0.39,
+     0.42,
+     0.47,
+     0.51,
+     0.52,
+     0.48,
+     0.44,
+     0.42,
+     0.38
+    ]
+   },
+   "ndvi_profile": [
+    0.37,
+    0.41,
+    0.38,
+    0.44,
+    0.49,
+    0.57,
+    0.68,
+    0.76,
+    0.71,
+    0.57,
+    0.37,
+    0.37
+   ],
+   "sources": [
+    "NASA POWER",
+    "MODIS MOD13Q1"
+   ]
+  },
+  {
+   "id": "junee",
+   "name": "Paddock near Junee",
+   "region": "Riverina, NSW",
+   "center": [
+    -34.83,
+    147.55
+   ],
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       147.545,
+       -34.826
+      ],
+      [
+       147.555,
+       -34.826
+      ],
+      [
+       147.555,
+       -34.834
+      ],
+      [
+       147.545,
+       -34.834
+      ],
+      [
+       147.545,
+       -34.826
+      ]
+     ]
+    ]
+   },
+   "current_rotation": [
+    "wheat",
+    "canola",
+    "wheat",
+    "wheat"
+   ],
+   "features": {
+    "years": "2016–2025",
+    "n_years": 10,
+    "annual_rain_mm": 577.0,
+    "gs_rain_mm": 277.0,
+    "gs_rain_min_mm": 145.0,
+    "gs_rain_cv_pct": 46.0,
+    "frost_days_aug_oct": 8.4,
+    "heat_days_oct_nov": 5.4,
+    "heavy_rain_days": 2.0,
+    "sowing_soil_wetness": 0.4,
+    "ndvi_years": "2016–2025",
+    "bare_months_per_year": 0.6,
+    "ndvi_peak_mean": 0.8
+   },
+   "monthly": {
+    "rain_mm": [
+     73.0,
+     36.0,
+     59.0,
+     31.0,
+     35.0,
+     41.0,
+     37.0,
+     35.0,
+     39.0,
+     59.0,
+     75.0,
+     57.0
+    ],
+    "frost_days": [
+     0.0,
+     0.0,
+     0.0,
+     0.1,
+     1.4,
+     7.9,
+     8.3,
+     6.9,
+     1.5,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "heat_days": [
+     18.0,
+     12.3,
+     7.5,
+     0.5,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.1,
+     0.8,
+     4.6,
+     12.5
+    ],
+    "soil_wetness": [
+     0.36,
+     0.34,
+     0.36,
+     0.39,
+     0.42,
+     0.47,
+     0.51,
+     0.52,
+     0.48,
+     0.44,
+     0.42,
+     0.38
+    ]
+   },
+   "ndvi_profile": [
+    0.35,
+    0.37,
+    0.35,
+    0.34,
+    0.44,
+    0.54,
+    0.67,
+    0.77,
+    0.7,
+    0.56,
+    0.41,
+    0.39
+   ],
+   "sources": [
+    "NASA POWER",
+    "MODIS MOD13Q1"
+   ]
+  },
+  {
+   "id": "lockhart",
+   "name": "Paddock near Lockhart",
+   "region": "Riverina, NSW",
+   "center": [
+    -35.2,
+    146.76
+   ],
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       146.755,
+       -35.196
+      ],
+      [
+       146.765,
+       -35.196
+      ],
+      [
+       146.765,
+       -35.204
+      ],
+      [
+       146.755,
+       -35.204
+      ],
+      [
+       146.755,
+       -35.196
+      ]
+     ]
+    ]
+   },
+   "current_rotation": [
+    "wheat",
+    "canola",
+    "wheat",
+    "wheat"
+   ],
+   "features": {
+    "years": "2016–2025",
+    "n_years": 10,
+    "annual_rain_mm": 519.0,
+    "gs_rain_mm": 256.0,
+    "gs_rain_min_mm": 122.0,
+    "gs_rain_cv_pct": 48.0,
+    "frost_days_aug_oct": 6.1,
+    "heat_days_oct_nov": 6.9,
+    "heavy_rain_days": 2.6,
+    "sowing_soil_wetness": 0.4,
+    "ndvi_years": "2016–2025",
+    "bare_months_per_year": 2.7,
+    "ndvi_peak_mean": 0.76
+   },
+   "monthly": {
+    "rain_mm": [
+     68.0,
+     27.0,
+     53.0,
+     30.0,
+     33.0,
+     37.0,
+     34.0,
+     33.0,
+     37.0,
+     52.0,
+     66.0,
+     49.0
+    ],
+    "frost_days": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.8,
+     5.1,
+     7.1,
+     5.1,
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "heat_days": [
+     19.8,
+     14.1,
+     9.8,
+     0.8,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.3,
+     1.2,
+     5.7,
+     14.2
+    ],
+    "soil_wetness": [
+     0.34,
+     0.33,
+     0.34,
+     0.37,
+     0.42,
+     0.47,
+     0.5,
+     0.5,
+     0.47,
+     0.44,
+     0.41,
+     0.38
+    ]
+   },
+   "ndvi_profile": [
+    0.26,
+    0.28,
+    0.27,
+    0.3,
+    0.35,
+    0.45,
+    0.62,
+    0.71,
+    0.63,
+    0.42,
+    0.3,
+    0.27
+   ],
+   "sources": [
+    "NASA POWER",
+    "MODIS MOD13Q1"
+   ]
+  },
+  {
+   "id": "temora",
+   "name": "Paddock near Temora",
+   "region": "Riverina, NSW",
+   "center": [
+    -34.47,
+    147.49
+   ],
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       147.485,
+       -34.466
+      ],
+      [
+       147.495,
+       -34.466
+      ],
+      [
+       147.495,
+       -34.474
+      ],
+      [
+       147.485,
+       -34.474
+      ],
+      [
+       147.485,
+       -34.466
+      ]
+     ]
+    ]
+   },
+   "current_rotation": [
+    "wheat",
+    "canola",
+    "wheat",
+    "wheat"
+   ],
+   "features": {
+    "years": "2016–2025",
+    "n_years": 10,
+    "annual_rain_mm": 553.0,
+    "gs_rain_mm": 262.0,
+    "gs_rain_min_mm": 120.0,
+    "gs_rain_cv_pct": 51.0,
+    "frost_days_aug_oct": 8.5,
+    "heat_days_oct_nov": 5.9,
+    "heavy_rain_days": 2.6,
+    "sowing_soil_wetness": 0.38,
+    "ndvi_years": "2016–2025",
+    "bare_months_per_year": 1.5,
+    "ndvi_peak_mean": 0.77
+   },
+   "monthly": {
+    "rain_mm": [
+     70.0,
+     37.0,
+     60.0,
+     31.0,
+     33.0,
+     39.0,
+     34.0,
+     32.0,
+     38.0,
+     56.0,
+     72.0,
+     53.0
+    ],
+    "frost_days": [
+     0.0,
+     0.0,
+     0.0,
+     0.1,
+     1.5,
+     6.9,
+     7.8,
+     7.0,
+     1.5,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "heat_days": [
+     18.9,
+     12.7,
+     8.1,
+     0.8,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.2,
+     1.0,
+     4.9,
+     13.4
+    ],
+    "soil_wetness": [
+     0.34,
+     0.32,
+     0.34,
+     0.36,
+     0.4,
+     0.44,
+     0.47,
+     0.47,
+     0.44,
+     0.4,
+     0.39,
+     0.35
+    ]
+   },
+   "ndvi_profile": [
+    0.35,
+    0.38,
+    0.35,
+    0.42,
+    0.49,
+    0.58,
+    0.66,
+    0.73,
+    0.68,
+    0.54,
+    0.38,
+    0.35
+   ],
+   "sources": [
+    "NASA POWER",
+    "MODIS MOD13Q1"
+   ]
+  }
+ ]
+}

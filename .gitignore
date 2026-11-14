@@ -1,0 +1,64 @@
+# SeedData: allow-list .gitignore
+# Everything at the top level is ignored unless listed below with "!".
+# Add a new top-level file or folder here before it can be committed.
+
+/*
+
+# --- Files and folders that belong in the public repository ---
+!/.gitignore
+!/.gitattributes
+!/.env.example
+!/.github/
+!/api/
+!/app/
+!/data/
+!/docs/
+!/pipelines/
+!/CHANGELOG.md
+!/CONTRIBUTING.md
+!/LICENSE
+!/README.md
+!/package.json
+!/vercel.json
+
+# --- Never committed, even inside allowed folders ---
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+!.env.example
+
+# Internal team material (stays in the Shared Drive)
+docs/team-plan.md
+docs/spikes/
+*.docx
+*.xlsx
+*.pptx
+*.pdf
+
+# Large or regenerable data
+data/raw/
+*.tif
+*.tiff
+*.nc
+*.h5
+*.hdf
+*.zip
+
+# Python and Node build files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+node_modules/
+.vercel/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
