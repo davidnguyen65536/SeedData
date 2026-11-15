@@ -7,7 +7,15 @@ SeedData helps Australian grain farmers and their agronomists explore crop rotat
 
 > SeedData supports farmer judgment and local agronomic advice; it does not replace them. Scores are indicative.
 
-**Live demo:** https://seed-data-nasa.vercel.app · **Pilot:** twelve dryland paddocks across Australia's grain belt (NSW, VIC, SA, WA, QLD), plus any spot you tap on the map
+| | |
+| --- | --- |
+| **Live app** | https://seed-data-nasa.vercel.app |
+| **Slide deck (PDF)** | [SeedData_slides.pdf](app/deck/SeedData_slides.pdf): seven slides, to read or print |
+| **Interactive deck** | https://seed-data-nasa.vercel.app/deck: the same story as a short game to click through ([see below](#presentation)) |
+| **Demo video (30 s)** | https://youtu.be/kVB4XNWzDsM |
+| **Feature walkthrough (2 min)** | https://youtu.be/nLcaGttTr-U: every feature, start to finish |
+
+**Pilot:** twelve dryland paddocks across Australia's grain belt (NSW, VIC, SA, WA, QLD), plus any spot you tap on the map
 
 ## What it does
 
@@ -28,6 +36,13 @@ The dashboard opens with one question: **the seasons are shifting, so which crop
 5. **How it works (the method):** the six steps from data to answer, who we are (Team SeedData), and a plain-language glossary. Dotted terms elsewhere show their meaning on hover or tap.
 
 Every number in an explanation, story, comparison or answer comes from a numbered fact. An AI model can write the wording, but a checker rejects any number that isn't one of the facts.
+
+## Presentation
+
+Two versions of the same deck, both in [`app/deck/`](app/deck/):
+
+- **[Slide deck (PDF)](app/deck/SeedData_slides.pdf):** seven slides: the title, choosing your farmer, the challenge, the toolkit, rotations ranked for your goals, where SeedData goes next, and the team. Good for reading, printing or sharing.
+- **[Interactive deck](https://seed-data-nasa.vercel.app/deck):** the pitch as a short game. Choose your farmer, accept the quest (the challenge and its hazards), then open each tool (Story, Compare, Ask, Goals and Options) to watch it working in the app, and finish on where SeedData goes next. It runs in any browser and is best on a desktop. Use the arrow keys or Page Up / Page Down to move between slides, **▶ Present** for full screen, and Home to go back to the start.
 
 ## How it works
 
@@ -84,12 +99,14 @@ The app is static, so any static host works (GitHub Pages: serve the `app/` fold
 
 ## Team
 
-| Name               | Role | Contributed |
-| ------------------ | ---- | ----------- |
-| Andre Baruah       |      |             |
-| Johanna Josodipuro |      |             |
-| David Nguyen       |      |             |
-| Shaf Tabeeb        |      |             |
+Built in 48 hours by four people at the NASA Space Apps Challenge 2026 (Sydney). Names are in alphabetical order by surname.
+
+| Name | Role | Contributed |
+| --- | --- | --- |
+| Andre Baruah | Data Explorer | NASA datasets, data pipeline, research |
+| Johanna Josodipuro | Chief Storyteller and Pitch Magician | Turned ten years of NASA data into a quest worth following: story, marketing, demo videos, slides and the interactive deck |
+| David Nguyen | Full-Stack Farmer | Full stack, AI narrator, data pipelines, deployment |
+| Shaf Tabeeb | UX Alchemist | Design, front end, UX |
 
 ## Licence
 

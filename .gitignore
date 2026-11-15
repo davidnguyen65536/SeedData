@@ -36,6 +36,8 @@ docs/spikes/
 *.xlsx
 *.pptx
 *.pdf
+# The slide deck PDF is published with the app
+!/app/deck/SeedData_slides.pdf
 
 # Large or regenerable data
 data/raw/
