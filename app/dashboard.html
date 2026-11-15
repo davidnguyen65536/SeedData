@@ -20,48 +20,49 @@
     </filter>
   </svg>
   <nav class="top-nav" aria-label="Dashboard">
-    <!-- Glass tabs: the selected tab sits under a liquid-glass lens (tabs.js) -->
+    <a class="mark" href="index.html"><img src="favicon.svg" alt="" width="22" height="22"><span>Seed Data</span></a>
+    <!-- Glass tabs in story order: where, what happened, what to do, the evidence, the method (tabs.js) -->
     <div class="glass-tabs" role="tablist" aria-label="Dashboard sections">
       <span class="lens" aria-hidden="true"><span class="lens-body"></span></span>
-      <button role="tab" id="tab-options" aria-controls="panel-options" data-tab="options" aria-selected="true">Options</button>
-      <button role="tab" id="tab-story" aria-controls="panel-story" data-tab="story" aria-selected="false" tabindex="-1">Story</button>
-      <button role="tab" id="tab-paddock" aria-controls="panel-paddock" data-tab="paddock" aria-selected="false" tabindex="-1">Paddock</button>
-      <button role="tab" id="tab-data" aria-controls="panel-data" data-tab="data" aria-selected="false" tabindex="-1">Data</button>
-      <button role="tab" id="tab-how" aria-controls="panel-how" data-tab="how" aria-selected="false" tabindex="-1">How it works</button>
+      <button role="tab" id="tab-paddock" aria-controls="panel-paddock" data-tab="paddock" aria-selected="true"><span class="n" aria-hidden="true">1</span>Paddock</button>
+      <button role="tab" id="tab-story" aria-controls="panel-story" data-tab="story" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">2</span>Story</button>
+      <button role="tab" id="tab-options" aria-controls="panel-options" data-tab="options" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">3</span>Options</button>
+      <button role="tab" id="tab-data" aria-controls="panel-data" data-tab="data" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">4</span>Data</button>
+      <button role="tab" id="tab-how" aria-controls="panel-how" data-tab="how" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">5</span>How it works</button>
     </div>
   </nav>
   <div class="sheet">
   <header class="top">
     <div class="brand">
-      <h1>Seed Data</h1>
-      <p class="tag">Compare crop rotations for your paddock, backed by NASA Earth observations</p>
+      <p class="eyebrow">Seed Data · NASA Earth observations for Australian farms</p>
+      <h1>The seasons are shifting. Which crop rotation suits your paddock now?</h1>
+      <p class="tag">Pick a paddock, read what ten years of NASA data say about it, then compare rotations for the goals that matter to you.</p>
       <div class="paddock-switch" id="paddock-switch"></div>
     </div>
   </header>
 
   <main class="tabpanels">
-    <!-- Options: the answer, with the settings that rank it -->
-    <section class="tabpanel options active" id="panel-options" role="tabpanel" aria-labelledby="tab-options">
-      <aside class="panel settings">
-        <h2>What matters to you?</h2>
-        <p class="muted lead">Choose how much each goal counts. The options re-rank as you go.</p>
-        <div id="sliders" class="sliders"></div>
-        <h3 class="sub">Your farm</h3>
-        <label class="switch">
-          <input type="checkbox" id="livestock" role="switch">
-          <span class="knob" aria-hidden="true"></span>
-          <span class="switch-text"><b>I run sheep or cattle</b><small>Pasture years then count towards income</small></span>
-        </label>
-        <div class="current">
-          <p class="label">What you grow now</p>
-          <div id="current-rotation" class="rot-select"></div>
-        </div>
-      </aside>
-      <div class="results">
+    <!-- Paddock: where it is and what ten years of data say about it -->
+    <section class="tabpanel paddock active" id="panel-paddock" role="tabpanel" aria-labelledby="tab-paddock">
+      <div class="map-col">
+        <h2 class="pick-title">Choose a paddock</h2>
+        <p class="muted pick-lead">Pick one below or tap it on the map. Your options update straight away.</p>
+        <div class="paddock-list" id="paddock-list"></div>
         <div class="paddock-change" role="status" hidden></div>
-        <p class="cards-help">Each rotation gets a score out of 5 for every goal; the big number blends them using what matters to you. Higher is better. <a href="?tab=story" data-tab-link="story">Read the paddock's story</a> · <a href="?tab=how" data-tab-link="how">Words we use</a></p>
-        <div id="cards" class="cards"></div>
+        <div id="map" aria-label="Map of pilot paddocks"></div>
+        <p class="map-hint">Twelve pilot paddocks across Australia's grain belt. <b>Tap anywhere else on the map</b> to analyse that spot with live NASA data.</p>
+        <p class="live-status" id="live-status" role="status" hidden></p>
       </div>
+      <div class="panel" id="paddock-panel">
+        <h2 id="paddock-name">Pick a paddock on the map</h2>
+        <p class="muted" id="paddock-sub"></p>
+        <div class="facts" id="paddock-facts"></div>
+        <div class="charts">
+          <figure><figcaption>Average rain by month (mm), NASA POWER</figcaption><div id="chart-rain"></div></figure>
+          <figure><figcaption>Average greenness (NDVI) by month, MODIS; bare below 0.25</figcaption><div id="chart-ndvi"></div></figure>
+        </div>
+      </div>
+      <a class="next-step" href="?tab=story" data-tab-link="story"><span>Next</span> Read this paddock's story: ten years of rain, frost and heat →</a>
     </section>
 
     <!-- Story: the paddock's decade in five chapters, with an optional AI narrator -->
@@ -82,56 +83,109 @@
           </label>
           <button type="button" class="ai-btn" id="story-ai">Write it with AI</button>
           <button type="button" class="link-btn" id="story-plain" hidden>Back to plain facts</button>
+          <button type="button" class="voice-btn" id="story-listen" aria-pressed="false">Listen</button>
+          <button type="button" class="link-btn" id="story-script">Copy voice-over script</button>
         </div>
         <p class="muted story-status" id="story-status" role="status"></p>
       </div>
       <ol class="chapters" id="story-chapters"></ol>
+
+      <!-- Two paddocks side by side -->
+      <div class="panel compare" id="compare">
+        <div class="compare-head">
+          <div>
+            <h3>Compare with another paddock</h3>
+            <p class="muted">Same goals, same rules, two places. See how rain, frost and heat change the answer.</p>
+          </div>
+          <div class="story-controls">
+            <label class="tone">Compare <span id="compare-name">this paddock</span> with
+              <select id="compare-with"></select>
+            </label>
+            <button type="button" class="ai-btn" id="compare-ai">Write it with AI</button>
+          </div>
+        </div>
+        <p class="muted story-status" id="compare-status" role="status"></p>
+        <div class="compare-grid">
+          <table class="compare-table" id="compare-table"></table>
+          <ol class="compare-text" id="compare-text"></ol>
+        </div>
+        <p class="muted" id="compare-meta"></p>
+      </div>
+
+      <!-- Questions answered only from this paddock's facts -->
+      <div class="panel ask" id="ask">
+        <h3>Ask about this paddock</h3>
+        <p class="muted">Answers come only from the NASA facts for this paddock and the rotation scores. If the facts can't answer it, we say so.</p>
+        <form class="ask-form" id="ask-form">
+          <label class="sr-only" for="ask-q">Your question</label>
+          <input id="ask-q" type="text" maxlength="200" autocomplete="off" placeholder="e.g. How risky is frost here?">
+          <button type="submit" class="ai-btn" id="ask-go">Ask</button>
+        </form>
+        <div class="ask-chips" id="ask-chips">
+          <button type="button">How reliable is the rain?</button>
+          <button type="button">How bad is frost at flowering?</button>
+          <button type="button">Is heat a problem at grain fill?</button>
+          <button type="button">Which rotation suits my goals?</button>
+        </div>
+        <div class="ask-answer" id="ask-answer" role="status" aria-live="polite"></div>
+      </div>
       <div class="panel story-end">
         <h3>Before you decide</h3>
         <ul id="story-checks"></ul>
         <p class="muted">These are indicative scores from public data, not field trials. Walk the paddock and talk it through with your local agronomist before you change anything.</p>
         <p class="muted" id="story-meta"></p>
       </div>
+      <a class="next-step" href="?tab=options" data-tab-link="options"><span>Next</span> Compare rotations for your goals →</a>
     </section>
 
-    <!-- Paddock: where it is and what ten years of data say about it -->
-    <section class="tabpanel paddock" id="panel-paddock" role="tabpanel" aria-labelledby="tab-paddock">
-      <div class="map-col">
-        <h2 class="pick-title">Choose a paddock</h2>
-        <p class="muted pick-lead">Pick one below or tap it on the map. Your options update straight away.</p>
-        <div class="paddock-list" id="paddock-list"></div>
-        <div class="paddock-change" role="status" hidden></div>
-        <div id="map" aria-label="Map of pilot paddocks"></div>
-        <p class="map-hint">Twelve pilot paddocks across Australia's grain belt. <b>Tap anywhere else on the map</b> to analyse that spot with live NASA data.</p>
-        <p class="live-status" id="live-status" role="status" hidden></p>
-      </div>
-      <div class="panel" id="paddock-panel">
-        <h2 id="paddock-name">Pick a paddock on the map</h2>
-        <p class="muted" id="paddock-sub"></p>
-        <div class="facts" id="paddock-facts"></div>
-        <div class="charts">
-          <figure><figcaption>Average rain by month (mm), NASA POWER</figcaption><div id="chart-rain"></div></figure>
-          <figure><figcaption>Average greenness (NDVI) by month, MODIS; bare below 0.25</figcaption><div id="chart-ndvi"></div></figure>
+    <!-- Options: the answer, with the settings that rank it -->
+    <section class="tabpanel options" id="panel-options" role="tabpanel" aria-labelledby="tab-options">
+      <aside class="panel settings">
+        <h2>What matters to you?</h2>
+        <p class="muted lead">Choose how much each goal counts. The options re-rank as you go.</p>
+        <div id="sliders" class="sliders"></div>
+        <h3 class="sub">Your farm</h3>
+        <label class="switch">
+          <input type="checkbox" id="livestock" role="switch">
+          <span class="knob" aria-hidden="true"></span>
+          <span class="switch-text"><b>I run sheep or cattle</b><small>Pasture years then count towards income</small></span>
+        </label>
+        <div class="current">
+          <p class="label">What you grow now</p>
+          <div id="current-rotation" class="rot-select"></div>
         </div>
+      </aside>
+      <div class="results">
+        <div class="paddock-change" role="status" hidden></div>
+        <p class="cards-help">Each rotation gets a score out of 5 for every goal; the big number blends them using what matters to you. Higher is better. <a href="?tab=story" data-tab-link="story">Read the paddock's story</a> · <a href="?tab=how" data-tab-link="how">Words we use</a></p>
+        <div id="cards" class="cards"></div>
       </div>
+      <a class="next-step" href="?tab=data" data-tab-link="data"><span>Next</span> Check the evidence behind every number →</a>
     </section>
 
-    <!-- Data: every number with its source, and the limits -->
+    <!-- Data: every number with its source, the limits, and where the data comes from -->
     <section class="tabpanel data" id="panel-data" role="tabpanel" aria-labelledby="tab-data">
-      <div class="panel">
-        <h2>Every number and where it comes from</h2>
-        <p class="muted">For <span id="data-paddock">this paddock</span>. These are the facts the scores and explanations are built from.</p>
-        <div class="table-wrap"><table class="fact-table" id="fact-table"><thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead><tbody></tbody></table></div>
+      <div class="panel data-intro">
+        <div>
+          <h2>The evidence for <span id="data-paddock">this paddock</span></h2>
+          <p class="muted">Every number the scores, story and explanations use, grouped by where it comes from.</p>
+        </div>
+        <dl class="data-stats" id="data-stats"></dl>
       </div>
-      <div class="panel" id="gaps-panel">
+      <div class="panel data-facts">
+        <div class="table-wrap"><table class="fact-table" id="fact-table"><thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Period</th></tr></thead><tbody></tbody></table></div>
+      </div>
+      <div class="panel data-gaps" id="gaps-panel">
         <h2>What the data can't tell you</h2>
+        <p class="muted">Check these on the ground or with your agronomist.</p>
         <ul id="gaps"></ul>
       </div>
-      <div class="panel">
-        <h2>Data sources</h2>
-        <p>NASA POWER (daily weather and soil wetness) and MODIS MOD13Q1 NDVI greenness via ORNL DAAC for twelve pilot paddocks in New South Wales, Victoria, South Australia, Western Australia and Queensland, 2016–2025. Spots you pick on the map use NASA POWER fetched live. Optional: SMAP soil moisture and SRTM slope via NASA AppEEARS, SILO rainfall, and the Soil and Landscape Grid of Australia. Map © OpenStreetMap contributors.</p>
+      <div class="panel data-sources">
+        <h2>Where the data comes from</h2>
+        <div class="source-grid" id="source-grid"></div>
         <p class="muted" id="data-stamp"></p>
       </div>
+      <a class="next-step" href="?tab=how" data-tab-link="how"><span>Next</span> See how Seed Data works and the words we use →</a>
     </section>
 
     <!-- How it works: the method, for agronomists and judges -->
@@ -153,6 +207,7 @@
         <p class="muted">Plain meanings for the farming and satellite words on this page. Dotted words elsewhere show these when you hover or tap them.</p>
         <dl class="glossary" id="glossary"></dl>
       </div>
+      <a class="next-step" href="?tab=paddock" data-tab-link="paddock"><span>Start again</span> Try another paddock, or tap anywhere on the map →</a>
     </section>
   </main>
 

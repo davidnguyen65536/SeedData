@@ -3,7 +3,7 @@
 
 import { PRIORITIES, evaluate, gapsFor } from './scoring.js';
 import { factsFor, templateExplanation, verifyAndFill } from './explain.js';
-import { CHAPTERS, storyFacts, templateStory, yearBars } from './story.js';
+import { CHAPTERS, COMPARE_CHAPTERS, storyFacts, templateStory, yearBars, compareFacts, templateCompare, factsForQuestion, templateAnswer, voiceScript } from './story.js';
 import { GLOSSARY, define } from './glossary.js';
 import { liveLocation } from './live.js';
 
@@ -17,6 +17,8 @@ const state = {
   results: [],
   layers: {},
   aiStory: null,
+  aiCompare: null,
+  compareId: null,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -42,6 +44,9 @@ async function init() {
   buildMap();
   buildGlossary();
   setupStory();
+  setupCompare();
+  setupAsk();
+  setupVoice();
   const fromHash = data.paddocks.find((p) => `#${p.id}` === location.hash);
   selectPaddock(fromHash || data.paddocks[0]);
 }
@@ -250,6 +255,7 @@ function renderPaddock() {
     factTile(f.smap_sowing_sm, 'm³/m³', 'Soil moisture at sowing', 'SMAP L4', 'smap'),
     factTile(f.soil_organic_carbon_pct, '%', 'Soil organic carbon', 'Soil and Landscape Grid', 'oc'),
   ].join('') || '<p class="muted">No data loaded for this paddock yet. Run the pipelines (see README).</p>';
+  renderSources(p);
   $('chart-rain').innerHTML = barChart(p.monthly?.rain_mm || []);
   $('chart-ndvi').innerHTML = lineChart(p.ndvi_profile || [], 0.25);
 }
@@ -432,6 +438,7 @@ const storyKey = () => JSON.stringify([state.paddock?.id, state.weights, state.h
 function renderStory() {
   const box = $('story-chapters');
   if (!box || !state.paddock || !state.results.length) return;
+  stopVoice();
   const p = state.paddock;
   const story = storyFacts(p, state.results);
   const plainText = templateStory(p, story);
@@ -462,6 +469,8 @@ function renderStory() {
   $('story-meta').textContent = ai
     ? `Narrated by ${ai.model}. Every number was checked against the facts on the Data tab before it was shown.`
     : 'Written from the facts by fixed rules. Every number comes from the Data tab.';
+  renderCompare();
+  if ($('ask-answer').dataset.for !== state.paddock.id) $('ask-answer').innerHTML = '';
 }
 
 async function writeStoryWithAI() {
@@ -493,4 +502,213 @@ async function writeStoryWithAI() {
     btn.disabled = false;
     renderStory();
   }
+}
+
+
+// ---------- Shared call to the AI endpoint ----------
+// Returns the checked, filled text, or throws with a plain reason.
+async function askModel(payload, facts) {
+  const resp = await fetch('/api/explain', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...payload, facts: facts.map(({ key: _k, ...f }) => f) }),
+  });
+  if (resp.status === 501) throw Object.assign(new Error('the AI narrator is not switched on for this site yet (no API key)'), { off: true });
+  if (!resp.ok) throw new Error(`the AI service answered ${resp.status}`);
+  const body = await resp.json();
+  const checked = verifyAndFill(body.template || '', facts);
+  if (!checked.ok) throw new Error('the AI text failed the number check');
+  return { text: checked.text, model: body.model, separator: body.separator || '###' };
+}
+
+// ---------- Two paddocks side by side ----------
+function setupCompare() {
+  const sel = $('compare-with');
+  if (!sel) return;
+  sel.addEventListener('change', () => { state.compareId = sel.value; state.aiCompare = null; renderCompare(); });
+  $('compare-ai').addEventListener('click', () => compareWithAI());
+}
+
+function compareState() {
+  const a = state.paddock;
+  const others = state.data.paddocks.filter((p) => p.id !== a.id);
+  if (!others.length) return null;
+  // Default to the most different paddock in growing-season rain, so the contrast is clear.
+  const gs = (p) => p.features?.gs_rain_mm ?? 0;
+  if (!others.some((p) => p.id === state.compareId)) {
+    state.compareId = others.reduce((x, y) => (Math.abs(gs(y) - gs(a)) > Math.abs(gs(x) - gs(a)) ? y : x)).id;
+  }
+  const b = others.find((p) => p.id === state.compareId);
+  const opts = { hasLivestock: state.hasLivestock };
+  const resultsB = evaluate(b, state.crops, state.weights, opts);
+  const cmp = compareFacts(a, b, state.results, resultsB);
+  return { a, b, others, cmp, key: JSON.stringify([a.id, b.id, state.weights, state.hasLivestock, state.currentRotation, $('story-tone').value]) };
+}
+
+function renderCompare() {
+  if (!$('compare') || !state.paddock) return;
+  const c = compareState();
+  if (!c) return;
+  const { a, b, others, cmp } = c;
+  $('compare-name').textContent = cmp.nameA;
+  $('compare-with').innerHTML = others.map((p) => `<option value="${p.id}" ${p.id === b.id ? 'selected' : ''}>${esc(p.live ? 'Your chosen spot' : p.name.replace(/^Paddock near /, ''))}${p.region && !p.live ? ` (${esc(p.region)})` : ''}</option>`).join('');
+  const row = (label, ka, kb, unit, higherIsMore = true) => {
+    const va = a.features?.[ka], vb = b.features?.[kb ?? ka];
+    if (!has(va) && !has(vb)) return '';
+    const more = has(va) && has(vb) && va !== vb ? ((va > vb) === higherIsMore ? 'a' : 'b') : '';
+    const cell = (v, side) => `<td class="${more === side ? 'more' : ''}">${has(v) ? `${v}${unit}` : '—'}</td>`;
+    return `<tr><td>${label}</td>${cell(va, 'a')}${cell(vb, 'b')}</tr>`;
+  };
+  const bestRow = `<tr><td>Best rotation for your goals</td><td>${esc(cmp.bestA.label)} ${cmp.bestA.overall.toFixed(1)}</td><td>${esc(cmp.bestB.label)} ${cmp.bestB.overall.toFixed(1)}</td></tr>`;
+  $('compare-table').innerHTML = `<thead><tr><th></th><th>${esc(cmp.nameA)}</th><th>${esc(cmp.nameB)}</th></tr></thead><tbody>
+    ${row(term('Growing-season rain', 'gs'), 'gs_rain_mm', null, ' mm')}
+    ${row('Driest season', 'gs_rain_min_mm', null, ' mm')}
+    ${row(term('Rain variation', 'cv'), 'gs_rain_cv_pct', null, '%')}
+    ${row(term('Frost days at flowering', 'frost'), 'frost_days_aug_oct', null, '')}
+    ${row(term('Hot days at grain fill', 'grainfill'), 'heat_days_oct_nov', null, '')}
+    ${row(term('Months bare', 'bare'), 'bare_months_per_year', null, '')}
+    ${bestRow}</tbody>`;
+  const ai = state.aiCompare && state.aiCompare.key === c.key ? state.aiCompare : null;
+  const plain = templateCompare(a, b, cmp);
+  $('compare-text').innerHTML = COMPARE_CHAPTERS.map((ch, i) => `<li><h4>${esc(ch.title)}</h4><p>${esc(ai?.paras?.[i] ?? verifyAndFill(plain[ch.id], cmp.facts).text)}</p></li>`).join('');
+  $('compare-ai').textContent = ai ? 'Rewrite with AI' : 'Write it with AI';
+  $('compare-meta').textContent = ai ? `Narrated by ${ai.model}; every number checked against the facts.` : 'Written from the facts by fixed rules. Bold marks the higher value.';
+}
+
+async function compareWithAI() {
+  const c = compareState();
+  if (!c) return;
+  const btn = $('compare-ai'), status = $('compare-status');
+  btn.disabled = true;
+  status.textContent = 'Writing the comparison with AI…';
+  try {
+    const r = await askModel({ mode: 'compare', tone: $('story-tone').value, paddock: `${c.cmp.nameA} and ${c.cmp.nameB}`, chapters: COMPARE_CHAPTERS.map((x) => x.title) }, c.cmp.facts);
+    const paras = r.text.split(r.separator).map((x) => x.trim()).filter(Boolean);
+    if (paras.length !== COMPARE_CHAPTERS.length) throw new Error('the AI comparison came back in the wrong shape');
+    state.aiCompare = { key: c.key, paras, model: r.model };
+    status.textContent = '';
+  } catch (err) {
+    state.aiCompare = null;
+    status.textContent = `Showing plain facts: ${err.message}.`;
+  } finally {
+    btn.disabled = false;
+    renderCompare();
+  }
+}
+
+// ---------- Ask about this paddock ----------
+function setupAsk() {
+  const form = $('ask-form');
+  if (!form) return;
+  form.addEventListener('submit', (e) => { e.preventDefault(); askPaddock($('ask-q').value); });
+  $('ask-chips').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { $('ask-q').value = b.textContent; askPaddock(b.textContent); }));
+}
+
+async function askPaddock(question) {
+  const q = question.trim().slice(0, 200);
+  if (!q || !state.paddock) return;
+  const out = $('ask-answer'), btn = $('ask-go');
+  const story = storyFacts(state.paddock, state.results);
+  const show = (text, meta) => {
+    out.dataset.for = state.paddock.id;
+    out.innerHTML = `<p class="q">${esc(q)}</p><p>${esc(text)}</p><p class="meta">${esc(meta)}</p>`;
+  };
+  const fallback = (why) => {
+    const t = templateAnswer(q, story.facts);
+    if (!t) return show("The NASA facts for this paddock can't answer that. Try asking about rain, frost, heat, bare ground, soil wetness at sowing or which rotation suits your goals.", why || 'Answered by fixed rules.');
+    show(verifyAndFill(t, story.facts).text, `Straight from the facts on the Data tab${why ? `. ${why}` : ''}.`);
+  };
+  btn.disabled = true;
+  out.innerHTML = '<p class="meta">Looking through the facts…</p>';
+  try {
+    const r = await askModel({ mode: 'ask', tone: $('story-tone').value, paddock: state.paddock.live ? 'your chosen spot' : state.paddock.name, question: q }, story.facts);
+    show(r.text, `Answered by ${r.model} using only this paddock's facts; every number checked.`);
+  } catch (err) {
+    fallback(err.off ? '' : `AI answer unavailable: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ---------- Voice-over (read the story aloud, or copy the script for the demo video) ----------
+let speaking = false;
+function storyTexts() {
+  return [...document.querySelectorAll('#story-chapters .chapter p')].map((p) => p.textContent);
+}
+function setupVoice() {
+  const btn = $('story-listen');
+  if (!btn) return;
+  if (!('speechSynthesis' in window)) btn.hidden = true;
+  btn.addEventListener('click', () => (speaking ? stopVoice() : startVoice()));
+  $('story-script').addEventListener('click', async () => {
+    const title = `The story of ${$('story-name').textContent}`;
+    const script = voiceScript(title, CHAPTERS, storyTexts());
+    try { await navigator.clipboard.writeText(script); $('story-status').textContent = 'Voice-over script copied. Paste it into your video editor or read it as the narrator.'; }
+    catch { $('story-status').textContent = 'Could not copy automatically; select the chapter text instead.'; }
+  });
+}
+function pickVoice() {
+  const voices = speechSynthesis.getVoices();
+  return voices.find((v) => v.lang === 'en-AU') || voices.find((v) => v.lang?.startsWith('en-GB')) || voices.find((v) => v.lang?.startsWith('en')) || null;
+}
+function startVoice() {
+  const items = [...document.querySelectorAll('#story-chapters .chapter')];
+  if (!items.length) return;
+  speechSynthesis.cancel();
+  speaking = true;
+  $('story-listen').setAttribute('aria-pressed', 'true');
+  $('story-listen').textContent = 'Stop';
+  const voice = pickVoice();
+  const say = (i) => {
+    items.forEach((el, j) => el.classList.toggle('speaking', j === i));
+    if (!speaking || i >= items.length) return stopVoice();
+    const el = items[i];
+    el.scrollIntoView({ behavior: calmMotion.matches ? 'auto' : 'smooth', block: 'center' });
+    const u = new SpeechSynthesisUtterance(`${el.querySelector('h3').textContent}. ${el.querySelector('p').textContent}`);
+    if (voice) u.voice = voice;
+    u.rate = 0.95;
+    u.onend = () => say(i + 1);
+    u.onerror = () => stopVoice();
+    speechSynthesis.speak(u);
+  };
+  say(0);
+}
+function stopVoice() {
+  if (!speaking) return;
+  speaking = false;
+  speechSynthesis.cancel();
+  document.querySelectorAll('.chapter.speaking').forEach((el) => el.classList.remove('speaking'));
+  const btn = $('story-listen');
+  if (btn) { btn.setAttribute('aria-pressed', 'false'); btn.textContent = 'Listen'; }
+}
+
+
+// ---------- Data tab: headline figures and where each dataset comes from ----------
+function renderSources(p) {
+  const f = p.features || {};
+  const ndvi = (p.ndvi_profile || []).length > 0;
+  const SOURCES = [
+    { name: 'NASA POWER', who: 'NASA Langley', what: 'Daily rain, temperature and topsoil wetness', grain: 'about 50 km grid, daily', status: p.live ? 'live' : f.years ? 'ok' : 'off' },
+    { name: 'MODIS MOD13Q1 NDVI', who: 'NASA, via ORNL DAAC', what: 'How green the paddock is, every 16 days', grain: '250 m', status: ndvi ? 'ok' : p.live ? 'off' : 'next' },
+    { name: 'SMAP L4 soil moisture', who: 'NASA, via AppEEARS', what: 'Soil moisture at sowing', grain: '9 km', status: has(f.smap_sowing_sm) ? 'ok' : 'optional' },
+    { name: 'SRTM elevation', who: 'NASA, via AppEEARS', what: 'Slope, for erosion risk', grain: '30 m', status: has(f.slope_pct) ? 'ok' : 'optional' },
+    { name: 'SILO', who: 'Queensland Government', what: 'Rain-gauge check on NASA rainfall', grain: 'about 5 km', status: 'optional' },
+    { name: 'Soil and Landscape Grid', who: 'CSIRO and TERN', what: 'Soil organic carbon', grain: '90 m', status: has(f.soil_organic_carbon_pct) ? 'ok' : 'optional' },
+  ];
+  const LABEL = { ok: 'Loaded', live: 'Fetched live', next: 'Next pipeline run', optional: 'Optional, not loaded', off: 'Not available here' };
+  $('source-grid').innerHTML = SOURCES.map((x) => `
+    <article class="source ${x.status}">
+      <header><h3>${esc(x.name)}</h3><span class="badge">${LABEL[x.status]}</span></header>
+      <p>${esc(x.what)}</p>
+      <p class="muted">${esc(x.who)} · ${esc(x.grain)}</p>
+    </article>`).join('');
+  const loaded = SOURCES.filter((x) => x.status === 'ok' || x.status === 'live').length;
+  const measures = [f.gs_rain_mm, f.gs_rain_min_mm, f.gs_rain_cv_pct, f.frost_days_aug_oct, f.heat_days_oct_nov, f.heavy_rain_days, f.sowing_soil_wetness, f.bare_months_per_year, f.slope_pct, f.smap_sowing_sm, f.soil_organic_carbon_pct].filter(has).length;
+  const gaps = paddockGaps(p).length;
+  $('data-stats').innerHTML = [
+    [f.years || '—', 'years of record'],
+    [measures, 'measures'],
+    [`${loaded} of ${SOURCES.length}`, 'data sources loaded'],
+    [gaps, gaps === 1 ? 'thing to check' : 'things to check'],
+  ].map(([v, k]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
 }

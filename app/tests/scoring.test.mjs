@@ -111,3 +111,31 @@ test('glossary has a plain meaning for every term key used on the page', () => {
   }
   assert.ok(GLOSSARY.length >= 20);
 });
+
+import { compareFacts, templateCompare, COMPARE_CHAPTERS, templateAnswer } from '../story.js';
+const data = JSON.parse(readFileSync(new URL('../data/paddocks.json', import.meta.url), 'utf8'));
+const crops = cropsDoc;
+
+test('every two-paddock comparison passes the number check', () => {
+  const W = { water: 3, soil: 3, risk: 3, income: 3 };
+  for (const a of data.paddocks) for (const b of data.paddocks) {
+    if (a === b) continue;
+    const cmp = compareFacts(a, b, evaluate(a, crops, W), evaluate(b, crops, W));
+    const text = templateCompare(a, b, cmp);
+    for (const ch of COMPARE_CHAPTERS) {
+      const r = verifyAndFill(text[ch.id], cmp.facts);
+      assert.ok(r.ok, `${a.id} vs ${b.id} ${ch.id}: ${r.errors}`);
+    }
+  }
+});
+
+test('questions are answered only from facts, or not at all', () => {
+  const p = data.paddocks[0];
+  const story = storyFacts(p, evaluate(p, crops, { water: 3, soil: 3, risk: 3, income: 3 }));
+  for (const q of ['How reliable is the rain?', 'How bad is frost at flowering?', 'Is heat a problem?', 'Which rotation suits my goals?', 'How wet is the soil at sowing?']) {
+    const t = templateAnswer(q, story.facts);
+    assert.ok(t, q);
+    assert.ok(verifyAndFill(t, story.facts).ok, q);
+  }
+  assert.equal(templateAnswer('What will wheat sell for next year?', story.facts), null);
+});

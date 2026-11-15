@@ -11,14 +11,23 @@ SeedData helps Australian grain farmers and their agronomists explore crop rotat
 
 ## What it does
 
-1. **Map:** pick one of twelve pilot paddocks, or tap anywhere to analyse that spot with ten years of NASA POWER data fetched live.
-2. **Priorities:** four sliders, plus "I run sheep or cattle" and your current rotation.
-3. **Compare:** current rotation, legume break (field pea) and pasture phase (lucerne), each scored 0–5 per priority and overall.
-4. **Evidence:** ten years of NASA data per paddock: frost days at flowering, hot days at grain fill, growing-season rain and its variability, heavy-rain days, soil wetness at sowing, and months the paddock is bare (MODIS NDVI).
-5. **Why?** A plain-English explanation built from numbered facts. An optional AI model can write the wording, but a checker rejects any number that isn't one of the facts.
-6. **Honest gaps:** every paddock lists what the data can't tell you.
-7. **Story:** the paddock's decade in five chapters (rain, frost and heat, bare ground, what it means for your rotation), with year-by-year charts. An optional AI narrator rewrites it in the voice you choose (farmer, general public, judges, storyteller); the same number check applies.
-8. **Words we use:** a plain-language glossary, and dotted terms that show their meaning on hover or tap.
+The dashboard opens with one question: **the seasons are shifting, so which crop rotation suits your paddock now?** Its five tabs answer it in order, and each tab ends with a link to the next.
+
+1. **Paddock (where):** pick one of twelve pilot paddocks across NSW, VIC, SA, WA and QLD, or tap anywhere on the map to analyse that spot with ten years of NASA POWER data fetched live. Key facts and monthly rain and greenness charts.
+2. **Story (what happened):** the paddock's decade in five chapters (rain, frost and heat, bare ground, what it means for your rotation) with year-by-year charts.
+   - **AI narrator (optional):** rewrites the story in the voice you choose (farmer, general public, judges, storyteller).
+   - **Listen:** reads the story aloud. **Copy voice-over script** copies it for the demo video.
+   - **Compare with another paddock:** two places side by side, such as Horsham vs Dalby.
+   - **Ask about this paddock:** questions answered only from its facts. If the facts can't answer, it says so.
+3. **Options (what to do):** set how much each goal matters (saving water, improving soil, reducing risk, extra income), whether you run livestock, and what you grow now. Three rotations are ranked: what you grow now, a legume break (field pea) and a pasture phase (lucerne). Each is scored 0–5 per goal and overall, with things to check locally. "Why this score?" explains each one in plain English.
+4. **Data (the evidence):**
+   - Headline figures: years of record, measures, sources loaded, things to check.
+   - Every number grouped by where it comes from (NASA POWER, MODIS and so on), with its period.
+   - What the data can't tell you.
+   - A card for each data source showing whether it is loaded, fetched live, waiting for the next pipeline run, or optional.
+5. **How it works (the method):** the six steps from data to answer, and a plain-language glossary. Dotted terms elsewhere show their meaning on hover or tap.
+
+Every number in an explanation, story, comparison or answer comes from a numbered fact. An AI model can write the wording, but a checker rejects any number that isn't one of the facts.
 
 ## How it works
 

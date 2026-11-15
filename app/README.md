@@ -6,7 +6,7 @@ Static site: no build step. Serve this folder (`python -m http.server 8000 -d ap
 | --- | --- |
 | `index.html`, `landing/` | Front page: the animated farm diorama (see `landing/README.md`) |
 | `dashboard.html`, `styles.css`, `app.js` | The tool at `/dashboard`: page, layout, map (Leaflet) and interaction |
-| `tabs.js` | Glass tabs (Options, Paddock, Data, How it works): one panel at a time, `?tab=` links, the paddock label, the Data tab's fact table and the risk links to the evidence |
+| `tabs.js` | Glass tabs in story order (Paddock, Story, Options, Data, How it works): one panel at a time, `?tab=` links and next-step links, the paddock label, the Data tab's grouped fact table and the risk links to the evidence |
 | `sky.js` | The dashboard's animated sky: blue tiles, drifting text-character clouds, and a wind trail that follows the pointer (2D canvas, no libraries; `?debug` exposes `window.__sky`) |
 | `scoring.js` | Scoring rules (see `docs/methodology.md`) |
 | `story.js` | The Story tab: five chapters built from numbered facts, year-by-year charts |

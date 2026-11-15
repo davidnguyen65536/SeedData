@@ -61,7 +61,7 @@ function countUp(panel) {
 }
 
 function select(name, { focus = false, animate = true } = {}) {
-  if (!names.includes(name)) name = 'options';
+  if (!names.includes(name)) name = names[0];
   const tab = tabs[names.indexOf(name)];
   const from = current ? place(tabs[names.indexOf(current)]) : null, to = place(tab);
   for (const t of tabs) {
@@ -95,7 +95,7 @@ function select(name, { focus = false, animate = true } = {}) {
   current = name;
   if (focus) tab.focus();
   const url = new URL(location.href);
-  if (name === 'options') url.searchParams.delete('tab'); else url.searchParams.set('tab', name);
+  if (name === names[0]) url.searchParams.delete('tab'); else url.searchParams.set('tab', name);
   history.replaceState(null, '', url);
 }
 
@@ -117,7 +117,7 @@ document.addEventListener('click', (e) => {
 });
 addEventListener('resize', () => { const t = tabs[names.indexOf(current)]; const p = place(t); lens.style.transform = `translateX(${p.x}px)`; lens.style.width = `${p.w}px`; refract(p.w, t.offsetHeight); });
 
-select(new URL(location.href).searchParams.get('tab') || 'options', { animate: false });
+select(new URL(location.href).searchParams.get('tab') || names[0], { animate: false });
 document.fonts?.ready.then(() => select(current, { animate: false }));
 
 // ---- links between tabs ----
@@ -131,20 +131,37 @@ const syncPaddock = () => {
 };
 new MutationObserver(syncPaddock).observe(nameEl, { childList: true, characterData: true, subtree: true });
 
-// Data tab: every fact tile, as one table with its source.
+// Data tab: every fact tile, as one table grouped by where the number comes from.
 const facts = document.getElementById('paddock-facts');
 const tbody = document.querySelector('#fact-table tbody');
+const GROUPS = [
+  [/^NASA POWER/, 'Weather and topsoil wetness', 'NASA POWER'],
+  [/^MODIS/, 'Greenness from space', 'NASA MODIS'],
+  [/^SMAP/, 'Soil moisture from space', 'NASA SMAP'],
+  [/^SRTM/, 'Slope', 'NASA SRTM'],
+  [/./, 'Soil', 'Soil and Landscape Grid of Australia'],
+];
 const syncFacts = () => {
-  const rows = [...facts.querySelectorAll('.fact')].map((f) => {
+  const groups = new Map();
+  for (const f of facts.querySelectorAll('.fact')) {
+    const src = f.querySelector('.s')?.textContent.trim() || '';
+    const [, title, agency] = GROUPS.find(([re]) => re.test(src));
+    if (!groups.has(title)) groups.set(title, { agency, rows: [] });
     const tr = document.createElement('tr');
-    for (const [sel, tag] of [['.k', 'th'], ['.v', 'td'], ['.s', 'td']]) {
-      const cell = document.createElement(tag); cell.textContent = f.querySelector(sel)?.textContent.trim() || '';
-      if (tag === 'th') cell.scope = 'row';
-      tr.append(cell);
-    }
-    return tr;
-  });
-  tbody.replaceChildren(...rows);
+    const th = document.createElement('th'); th.scope = 'row'; th.textContent = f.querySelector('.k')?.textContent.trim() || '';
+    const v = document.createElement('td'); v.className = 'val'; v.textContent = f.querySelector('.v')?.textContent.trim() || '';
+    const when = document.createElement('td'); when.className = 'when'; when.textContent = (src.match(/\d{4}\s*[–-]\s*\d{4}/) || ['—'])[0];
+    tr.append(th, v, when);
+    groups.get(title).rows.push(tr);
+  }
+  const out = [];
+  for (const [title, { agency, rows }] of groups) {
+    const tr = document.createElement('tr'); tr.className = 'group';
+    const th = document.createElement('th'); th.colSpan = 3; th.scope = 'colgroup';
+    th.innerHTML = `<span></span><small></small>`; th.firstChild.textContent = title; th.lastChild.textContent = agency;
+    tr.append(th); out.push(tr, ...rows);
+  }
+  tbody.replaceChildren(...out);
 };
 new MutationObserver(syncFacts).observe(facts, { childList: true });
 

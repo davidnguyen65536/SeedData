@@ -46,6 +46,7 @@ Scores are clamped to 0–5. The overall score is the average weighted by the fa
 ## 5. Story and live locations
 
 - **Story tab** (`app/story.js`): five chapters built from numbered facts (average and extreme seasons, frost and heat, bare months, the best rotation for the user's goals). Rule-based text is always available. The optional AI narrator (`api/explain.js`, `mode: "story"`) writes the same chapters in a chosen voice using placeholders only; the checker rejects any number that is not a fact, and the server retries once with the errors listed before giving up.
+- **Comparison and questions:** the comparison scores the second paddock with the same goals and rules, and its text uses the same placeholder check. Questions are matched to facts by topic (rain, frost, heat, bare ground, soil wetness, rotation scores); the AI answers only from those facts and the fixed-rule fallback lists the matching facts or says the facts can't answer.
 - **Any location** (`app/live.js`): tapping the map fetches ten years of NASA POWER daily data for that point in the browser and summarises it with the same thresholds as the pipeline. Greenness, slope and soil are not loaded for these spots and are listed as gaps.
 
 ## 6. Known limits
