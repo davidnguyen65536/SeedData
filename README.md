@@ -1,11 +1,11 @@
-# SeedData
+# Seed Data
 
 **Compare crop rotations for your paddock, backed by NASA Earth observations.**
 NASA Space Apps Challenge 2026 · Field Shift: Adapting Farms with NASA Data
 
-SeedData helps Australian grain farmers and their agronomists explore crop rotations that could improve soil health and cope with changing weather. Pick a paddock, set what matters (saving water, improving soil, reducing risk, extra income) and compare three rotations, including the current one. Each option shows its scores, the risks that need local review, what the data can't tell you, and an explanation where every number is traced to its source.
+Seed Data helps Australian grain farmers and their agronomists explore crop rotations that could improve soil health and cope with changing weather. Pick a paddock, set what matters (saving water, improving soil, reducing risk, extra income) and compare three rotations, including the current one. Each option shows its scores, the risks that need local review, what the data can't tell you, and an explanation where every number is traced to its source.
 
-> SeedData supports farmer judgment and local agronomic advice; it does not replace them. Scores are indicative.
+> Seed Data supports farmer judgment and local agronomic advice; it does not replace them. Scores are indicative.
 
 | | |
 | --- | --- |
@@ -33,7 +33,7 @@ The dashboard opens with one question: **the seasons are shifting, so which crop
    - Every number grouped by where it comes from (NASA POWER, MODIS and so on), with its period.
    - What the data can't tell you.
    - A card for each data source showing whether it is loaded, fetched live, waiting for the next pipeline run, or optional.
-5. **How it works (the method):** the six steps from data to answer, who we are (Team SeedData), and a plain-language glossary. Dotted terms elsewhere show their meaning on hover or tap.
+5. **How it works (the method):** the six steps from data to answer, who we are (Team Seed Data), and a plain-language glossary. Dotted terms elsewhere show their meaning on hover or tap.
 
 Every number in an explanation, story, comparison or answer comes from a numbered fact. An AI model can write the wording, but a checker rejects any number that isn't one of the facts.
 
@@ -41,8 +41,8 @@ Every number in an explanation, story, comparison or answer comes from a numbere
 
 Two versions of the same deck, both in [`app/deck/`](app/deck/):
 
-- **[Slide deck (PDF)](app/deck/SeedData_slides.pdf):** seven slides: the title, choosing your farmer, the challenge, the toolkit, rotations ranked for your goals, where SeedData goes next, and the team. Good for reading, printing or sharing.
-- **[Interactive deck](https://seed-data-nasa.vercel.app/deck):** the pitch as a short game. Choose your farmer, accept the quest (the challenge and its hazards), then open each tool (Story, Compare, Ask, Goals and Options) to watch it working in the app, and finish on where SeedData goes next. It runs in any browser and is best on a desktop. Use the arrow keys or Page Up / Page Down to move between slides, **▶ Present** for full screen, and Home to go back to the start.
+- **[Slide deck (PDF)](app/deck/SeedData_slides.pdf):** seven slides: the title, choosing your farmer, the challenge, the toolkit, rotations ranked for your goals, where Seed Data goes next, and the team. Good for reading, printing or sharing.
+- **[Interactive deck](https://seed-data-nasa.vercel.app/deck):** the pitch as a short game. Choose your farmer, accept the quest (the challenge and its hazards), then open each tool (Story, Compare, Ask, Goals and Options) to watch it working in the app, and finish on where Seed Data goes next. It runs in any browser and is best on a desktop. Use the arrow keys or Page Up / Page Down to move between slides, **▶ Present** for full screen, and Home to go back to the start.
 
 ## How it works
 
@@ -110,7 +110,7 @@ Built in 48 hours by four people at the NASA Space Apps Challenge 2026 (Sydney).
 
 ## Licence
 
-Copyright © 2026 Team SeedData (David Nguyen, Johanna Josodipuro, Shaf Tabeeb, Andre Baruah). All rights reserved. The code is public so judges and the community can review and run it; see [LICENSE](LICENSE) for terms. Third-party components keep their own licences.
+Copyright © 2026 Team Seed Data (David Nguyen, Johanna Josodipuro, Shaf Tabeeb, Andre Baruah). All rights reserved. The code is public so judges and the community can review and run it; see [LICENSE](LICENSE) for terms. Third-party components keep their own licences.
 
 ## Acknowledgements
 
