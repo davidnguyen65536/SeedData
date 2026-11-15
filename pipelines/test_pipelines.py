@@ -41,6 +41,9 @@ def test_power_monthly_and_features():
     assert feats["n_years"] == 2
     assert feats["sowing_soil_wetness"] == 0.4
     assert len(clim["rain_mm"]) == 12
+    assert clim["yearly"]["year"] == [2020, 2021]
+    assert clim["yearly"]["frost_days"] == [3, 3]
+    assert clim["yearly"]["heat_days"] == [2, 2]
     # January 2020 has one missing day, so its sum is 30 not 31
     assert monthly.loc[0, "rain_mm"] == 30.0
 

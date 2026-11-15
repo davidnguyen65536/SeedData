@@ -66,3 +66,48 @@ test('the checker rejects invented numbers and promises', () => {
   assert.equal(verifyAndFill('Scores {f9}.', facts).ok, false);
   assert.equal(verifyAndFill('This will increase profit {f1}.', facts).ok, false);
 });
+
+// ---------- story, live location, glossary ----------
+import { storyFacts, templateStory, CHAPTERS } from '../story.js';
+import { summarisePower } from '../live.js';
+import { GLOSSARY, define } from '../glossary.js';
+
+const storyPaddock = { ...paddock, region: 'Riverina, NSW', yearly: { year: [2018, 2019, 2020], gs_rain_mm: [122, 160, 384], frost_days: [8, 10, 8], heat_days: [6, 16, 9] }, ndvi_profile: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2] };
+
+test('every story chapter passes the number check', () => {
+  const results = evaluate(storyPaddock, cropsDoc, equal);
+  const story = storyFacts(storyPaddock, results);
+  const text = templateStory(storyPaddock, story);
+  for (const c of CHAPTERS) {
+    const out = verifyAndFill(text[c.id], story.facts);
+    assert.ok(out.ok, `${c.id}: ${out.errors.join(', ')}`);
+    assert.ok(!out.text.includes('{f'), c.id);
+  }
+  assert.ok(verifyAndFill(text.seasons, story.facts).text.includes('2018'));
+});
+
+test('live NASA POWER summary matches the pipeline rules', () => {
+  const days = [];
+  for (let d = new Date(Date.UTC(2020, 0, 1)); d <= new Date(Date.UTC(2021, 11, 31)); d.setUTCDate(d.getUTCDate() + 1)) days.push(new Date(d));
+  const key = (d) => d.toISOString().slice(0, 10).replace(/-/g, '');
+  const series = (f) => Object.fromEntries(days.map((d) => [key(d), f(d)]));
+  const json = { properties: { parameter: {
+    T2M_MIN: series((d) => (d.getUTCMonth() === 8 && d.getUTCDate() <= 3 ? 0.5 : 8)),
+    T2M_MAX: series((d) => (d.getUTCMonth() === 10 && d.getUTCDate() <= 2 ? 35 : 20)),
+    PRECTOTCORR: series((d) => (d.getUTCMonth() === 5 && d.getUTCDate() === 15 ? 30 : 1)),
+    GWETTOP: series(() => 0.4),
+  } } };
+  const s = summarisePower(json);
+  assert.equal(s.features.frost_days_aug_oct, 3);
+  assert.equal(s.features.heat_days_oct_nov, 2);
+  assert.equal(s.features.heavy_rain_days, 1);
+  assert.deepEqual(s.yearly.year, [2020, 2021]);
+  assert.equal(s.monthly.rain_mm.length, 12);
+});
+
+test('glossary has a plain meaning for every term key used on the page', () => {
+  for (const k of ['gs', 'cv', 'frost', 'grainfill', 'heavy', 'wetness', 'ndvi', 'srtm', 'smap', 'oc', 'legume', 'pasture', 'erosion', 'crownrot']) {
+    assert.ok(define(k).length > 20, k);
+  }
+  assert.ok(GLOSSARY.length >= 20);
+});

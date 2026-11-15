@@ -43,9 +43,15 @@ Scores are clamped to 0–5. The overall score is the average weighted by the fa
 
 `app/explain.js` turns each result into numbered facts (value, unit, source). Explanations refer to facts by placeholder (`{f6}`). The checker rejects any text that contains a number not taken from a fact, refers to a fact that doesn't exist, or promises outcomes. With an AI key configured (`api/explain.js`), the model writes the wording; without one, fixed rules write it.
 
-## 5. Known limits
+## 5. Story and live locations
+
+- **Story tab** (`app/story.js`): five chapters built from numbered facts (average and extreme seasons, frost and heat, bare months, the best rotation for the user's goals). Rule-based text is always available. The optional AI narrator (`api/explain.js`, `mode: "story"`) writes the same chapters in a chosen voice using placeholders only; the checker rejects any number that is not a fact, and the server retries once with the errors listed before giving up.
+- **Any location** (`app/live.js`): tapping the map fetches ten years of NASA POWER daily data for that point in the browser and summarises it with the same thresholds as the pipeline. Greenness, slope and soil are not loaded for these spots and are listed as gaps.
+
+## 6. Known limits
 
 - NASA POWER cells are about 0.5° × 0.625° (roughly 50 km), so nearby paddocks can share climate values. MODIS pixels are 250 m, so small paddocks mix with their neighbours.
 - No crop price data: income is scored by market diversity only.
 - Rules are not calibrated against yield or trial data.
+- Northern paddocks (Moree, Dalby) flower earlier than southern ones; the fixed Aug–Oct frost and Oct–Nov heat windows are a southern-cropping simplification and are flagged as a gap for paddocks north of 31°S.
 - US-only datasets listed in the challenge (Web Soil Survey, SSURGO, CropScape, PRISM, NAIP, NLCD, OpenET, LANDFIRE, CoCoRaHS, NWIS, NASS, AMS) do not cover Australia; Australian equivalents are noted in `docs/data-sources.md`.

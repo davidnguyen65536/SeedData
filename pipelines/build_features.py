@@ -69,6 +69,15 @@ def power_features(m: pd.DataFrame) -> tuple[dict, dict]:
         "heat_days": [_num(clim.loc[i, "heat_days"]) for i in range(1, 13)],
         "soil_wetness": [_num(clim.loc[i, "gwettop"], 2) for i in range(1, 13)],
     }
+    # Year by year, for the story charts: growing-season rain, frost at flowering, heat at grain fill
+    frost_y = m[m["month"].isin(FROST_MONTHS)].groupby("year")["frost_days"].sum()
+    heat_y = m[m["month"].isin(HEAT_MONTHS)].groupby("year")["heat_days"].sum()
+    monthly["yearly"] = {
+        "year": [int(y) for y in years],
+        "gs_rain_mm": [_num(gs.get(y), 0) for y in years],
+        "frost_days": [int(frost_y.get(y, 0)) for y in years],
+        "heat_days": [int(heat_y.get(y, 0)) for y in years],
+    }
     return feats, monthly
 
 
@@ -139,7 +148,8 @@ def build() -> dict:
             "geometry": p["geometry"],
             "current_rotation": props.get("current_rotation", ["wheat", "canola", "wheat", "wheat"]),
             "features": feats,
-            "monthly": monthly,
+            "monthly": {k: v for k, v in monthly.items() if k != "yearly"},
+            "yearly": monthly.get("yearly", {}),
             "ndvi_profile": ndvi_profile,
             "sources": sources,
         })

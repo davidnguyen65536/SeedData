@@ -15,7 +15,25 @@
 
 import { verifyAndFill } from '../app/explain.js';
 
-const MAX_FACTS = 30;
+const MAX_FACTS = 40;
+const TONES = {
+  farmer: 'practical and direct, like a trusted local agronomist talking to a grain grower',
+  public: 'plain English for someone who has never farmed; explain any farming word in a few words',
+  judge: 'concise and evidence-led for a hackathon judge; make clear the figures come from NASA Earth observations',
+  story: 'warm and vivid, like the narration of a short documentary, but never exaggerating',
+};
+const SEP = '###';
+
+async function callModel(key, model, prompt, maxTokens) {
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+    body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] }),
+  });
+  if (!resp.ok) throw Object.assign(new Error('model call failed'), { status: resp.status });
+  const body = await resp.json();
+  return (body.content || []).map((c) => c.text || '').join('').trim();
+}
 
 export default async function handler(req, res) {
   const origin = process.env.ALLOWED_ORIGIN;
@@ -26,7 +44,7 @@ export default async function handler(req, res) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return res.status(501).json({ error: 'AI wording not configured' });
 
-  const { strategy, paddock, facts } = req.body || {};
+  const { strategy, paddock, facts, mode, tone, chapters } = req.body || {};
   if (!Array.isArray(facts) || facts.length === 0 || facts.length > MAX_FACTS) {
     return res.status(400).json({ error: 'facts must be a non-empty array' });
   }
@@ -34,29 +52,46 @@ export default async function handler(req, res) {
     id: String(f.id).slice(0, 4), label: String(f.label).slice(0, 120),
     value: f.value, unit: String(f.unit ?? '').slice(0, 20), source: String(f.source).slice(0, 80),
   }));
-
-  const model = process.env.MODEL || 'claude-sonnet-5-5';
-  const prompt = [
-    `Explain to an Australian grain farmer, in 3 to 4 short plain-English sentences, how the "${String(strategy).slice(0, 60)}" crop rotation scored on "${String(paddock).slice(0, 60)}".`,
-    'Use ONLY these facts. Refer to a fact\'s value ONLY by writing its placeholder, e.g. {f6}. Do not write any digits yourself.',
-    'Do not promise outcomes or predict yields. Say it is indicative and end by suggesting they check with their local agronomist.',
+  const voice = TONES[tone] || TONES.farmer;
+  const rules = [
+    'Use ONLY these facts. Refer to a fact\'s value ONLY by writing its placeholder, e.g. {f6}. Never write any digits yourself, not even years or "five": write years and scores only as placeholders.',
+    'Do not promise outcomes or predict yields. Do not use the words "guarantee", "definitely" or "will increase".',
     'Facts (JSON):',
     JSON.stringify(clean),
-  ].join('\n');
+  ];
 
+  let prompt, maxTokens;
+  if (mode === 'story') {
+    const titles = (Array.isArray(chapters) ? chapters : []).slice(0, 6).map((t) => String(t).slice(0, 60));
+    prompt = [
+      `Tell the story of the paddock "${String(paddock).slice(0, 60)}" in exactly ${titles.length} short paragraphs, one per chapter, in this order: ${titles.map((t, i) => `(${String.fromCharCode(97 + i)}) ${t}`).join('; ')}.`,
+      `Each paragraph is two or three sentences. Voice: ${voice}.`,
+      `Separate paragraphs with a line containing only ${SEP}. Do not write chapter titles or labels.`,
+      'In the last paragraph, explain what the best-scoring rotation offers compared with what is grown now.',
+      ...rules,
+    ].join('\n');
+    maxTokens = 900;
+  } else {
+    prompt = [
+      `Explain to an Australian grain farmer, in 3 to 4 short plain-English sentences, how the "${String(strategy).slice(0, 60)}" crop rotation scored on "${String(paddock).slice(0, 60)}". Voice: ${voice}.`,
+      'Say it is indicative and end by suggesting they check with their local agronomist.',
+      ...rules,
+    ].join('\n');
+    maxTokens = 400;
+  }
+
+  const model = process.env.MODEL || 'claude-sonnet-5-5';
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ model, max_tokens: 400, messages: [{ role: 'user', content: prompt }] }),
-    });
-    if (!resp.ok) return res.status(502).json({ error: `model call failed (${resp.status})` });
-    const body = await resp.json();
-    const template = (body.content || []).map((c) => c.text || '').join('').trim();
-    const check = verifyAndFill(template, clean);
+    let template = await callModel(key, model, prompt, maxTokens);
+    let check = verifyAndFill(template, clean);
+    if (!check.ok) {
+      // one retry, telling the model exactly what the checker rejected
+      template = await callModel(key, model, `${prompt}\n\nYour previous answer was rejected because it contained ${check.errors.join(', ')}. Rewrite it following every rule.`, maxTokens);
+      check = verifyAndFill(template, clean);
+    }
     if (!check.ok) return res.status(422).json({ error: 'failed checks', errors: check.errors });
-    return res.status(200).json({ template, model });
+    return res.status(200).json({ template, model, separator: SEP });
   } catch (err) {
-    return res.status(502).json({ error: 'model call failed' });
+    return res.status(502).json({ error: `model call failed${err.status ? ` (${err.status})` : ''}` });
   }
 }

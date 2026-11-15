@@ -32,7 +32,7 @@ export function factsFor(result, paddock) {
   return facts;
 }
 
-const fmt = (fact) => `${fact.value}${fact.unit && !fact.unit.startsWith('/') && !fact.unit.startsWith('of') ? ' ' : ''}${fact.unit ? fact.unit.replace(/^of /, ' of ') : ''}`.trim();
+const fmt = (fact) => `${fact.value}${fact.unit && !fact.unit.startsWith('/') && !fact.unit.startsWith('of') && fact.unit !== '%' ? ' ' : ''}${fact.unit ? fact.unit.replace(/^of /, ' of ') : ''}`.trim();
 const byLabel = (facts, start) => facts.find((x) => x.label.startsWith(start));
 
 /** Plain-English explanation built only from facts (no model needed). */

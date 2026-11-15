@@ -7,16 +7,18 @@ SeedData helps Australian grain farmers and their agronomists explore crop rotat
 
 > SeedData supports farmer judgment and local agronomic advice; it does not replace them. Scores are indicative.
 
-**Live demo:** _add the URL after deploying_ · **Pilot:** four dryland paddocks in the Riverina, NSW, Australia
+**Live demo:** https://seeddata-delta.vercel.app · **Pilot:** twelve dryland paddocks across Australia's grain belt (NSW, VIC, SA, WA, QLD), plus any spot you tap on the map
 
 ## What it does
 
-1. **Map:** pick a paddock.
+1. **Map:** pick one of twelve pilot paddocks, or tap anywhere to analyse that spot with ten years of NASA POWER data fetched live.
 2. **Priorities:** four sliders, plus "I run sheep or cattle" and your current rotation.
 3. **Compare:** current rotation, legume break (field pea) and pasture phase (lucerne), each scored 0–5 per priority and overall.
 4. **Evidence:** ten years of NASA data per paddock: frost days at flowering, hot days at grain fill, growing-season rain and its variability, heavy-rain days, soil wetness at sowing, and months the paddock is bare (MODIS NDVI).
 5. **Why?** A plain-English explanation built from numbered facts. An optional AI model can write the wording, but a checker rejects any number that isn't one of the facts.
 6. **Honest gaps:** every paddock lists what the data can't tell you.
+7. **Story:** the paddock's decade in five chapters (rain, frost and heat, bare ground, what it means for your rotation), with year-by-year charts. An optional AI narrator rewrites it in the voice you choose (farmer, general public, judges, storyteller); the same number check applies.
+8. **Words we use:** a plain-language glossary, and dotted terms that show their meaning on hover or tap.
 
 ## How it works
 

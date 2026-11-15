@@ -1,7 +1,7 @@
 {
   "type": "FeatureCollection",
   "name": "pilot_paddocks",
-  "description": "Pilot paddocks in the Riverina, NSW. Locations are approximate cropping-land sites chosen for the prototype; replace with real paddock boundaries. Soil fields are filled by hand from the Soil and Landscape Grid of Australia (leave null if unknown).",
+  "description": "Pilot paddocks across Australia's grain belt (NSW, VIC, SA, WA, QLD). Locations are approximate cropping-land sites chosen for the prototype; replace with real paddock boundaries. Soil fields are typed in by hand from the Soil and Landscape Grid of Australia (leave null if unknown).",
   "features": [
     {
       "type": "Feature",
@@ -9,12 +9,43 @@
         "id": "coolamon",
         "name": "Paddock near Coolamon",
         "region": "Riverina, NSW",
-        "current_rotation": ["wheat", "canola", "wheat", "wheat"],
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
         "soil_organic_carbon_pct": null,
         "soil_clay_pct": null,
         "soil_awc_mm": null
       },
-      "geometry": {"type": "Polygon", "coordinates": [[[147.240, -34.846], [147.250, -34.846], [147.250, -34.854], [147.240, -34.854], [147.240, -34.846]]]}
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              147.24,
+              -34.846
+            ],
+            [
+              147.25,
+              -34.846
+            ],
+            [
+              147.25,
+              -34.854
+            ],
+            [
+              147.24,
+              -34.854
+            ],
+            [
+              147.24,
+              -34.846
+            ]
+          ]
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -22,12 +53,43 @@
         "id": "junee",
         "name": "Paddock near Junee",
         "region": "Riverina, NSW",
-        "current_rotation": ["wheat", "canola", "wheat", "wheat"],
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
         "soil_organic_carbon_pct": null,
         "soil_clay_pct": null,
         "soil_awc_mm": null
       },
-      "geometry": {"type": "Polygon", "coordinates": [[[147.545, -34.826], [147.555, -34.826], [147.555, -34.834], [147.545, -34.834], [147.545, -34.826]]]}
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              147.545,
+              -34.826
+            ],
+            [
+              147.555,
+              -34.826
+            ],
+            [
+              147.555,
+              -34.834
+            ],
+            [
+              147.545,
+              -34.834
+            ],
+            [
+              147.545,
+              -34.826
+            ]
+          ]
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -35,12 +97,43 @@
         "id": "lockhart",
         "name": "Paddock near Lockhart",
         "region": "Riverina, NSW",
-        "current_rotation": ["wheat", "canola", "wheat", "wheat"],
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
         "soil_organic_carbon_pct": null,
         "soil_clay_pct": null,
         "soil_awc_mm": null
       },
-      "geometry": {"type": "Polygon", "coordinates": [[[146.755, -35.196], [146.765, -35.196], [146.765, -35.204], [146.755, -35.204], [146.755, -35.196]]]}
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              146.755,
+              -35.196
+            ],
+            [
+              146.765,
+              -35.196
+            ],
+            [
+              146.765,
+              -35.204
+            ],
+            [
+              146.755,
+              -35.204
+            ],
+            [
+              146.755,
+              -35.196
+            ]
+          ]
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -48,12 +141,395 @@
         "id": "temora",
         "name": "Paddock near Temora",
         "region": "Riverina, NSW",
-        "current_rotation": ["wheat", "canola", "wheat", "wheat"],
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
         "soil_organic_carbon_pct": null,
         "soil_clay_pct": null,
         "soil_awc_mm": null
       },
-      "geometry": {"type": "Polygon", "coordinates": [[[147.485, -34.466], [147.495, -34.466], [147.495, -34.474], [147.485, -34.474], [147.485, -34.466]]]}
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              147.485,
+              -34.466
+            ],
+            [
+              147.495,
+              -34.466
+            ],
+            [
+              147.495,
+              -34.474
+            ],
+            [
+              147.485,
+              -34.474
+            ],
+            [
+              147.485,
+              -34.466
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "dubbo",
+        "name": "Paddock near Dubbo",
+        "region": "Central West, NSW",
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              148.445,
+              -32.195
+            ],
+            [
+              148.455,
+              -32.195
+            ],
+            [
+              148.455,
+              -32.205
+            ],
+            [
+              148.445,
+              -32.205
+            ],
+            [
+              148.445,
+              -32.195
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "moree",
+        "name": "Paddock near Moree",
+        "region": "North West Plains, NSW",
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              149.745,
+              -29.495
+            ],
+            [
+              149.755,
+              -29.495
+            ],
+            [
+              149.755,
+              -29.505
+            ],
+            [
+              149.745,
+              -29.505
+            ],
+            [
+              149.745,
+              -29.495
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "parkes",
+        "name": "Paddock near Parkes",
+        "region": "Central West, NSW",
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              148.095,
+              -33.095
+            ],
+            [
+              148.105,
+              -33.095
+            ],
+            [
+              148.105,
+              -33.105
+            ],
+            [
+              148.095,
+              -33.105
+            ],
+            [
+              148.095,
+              -33.095
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "horsham",
+        "name": "Paddock near Horsham",
+        "region": "Wimmera, VIC",
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              142.095,
+              -36.615
+            ],
+            [
+              142.105,
+              -36.615
+            ],
+            [
+              142.105,
+              -36.625
+            ],
+            [
+              142.095,
+              -36.625
+            ],
+            [
+              142.095,
+              -36.615
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kadina",
+        "name": "Paddock near Kadina",
+        "region": "Yorke Peninsula, SA",
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.745,
+              -33.945
+            ],
+            [
+              137.755,
+              -33.945
+            ],
+            [
+              137.755,
+              -33.955
+            ],
+            [
+              137.745,
+              -33.955
+            ],
+            [
+              137.745,
+              -33.945
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "northam",
+        "name": "Paddock near Northam",
+        "region": "Avon Wheatbelt, WA",
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              116.745,
+              -31.615
+            ],
+            [
+              116.755,
+              -31.615
+            ],
+            [
+              116.755,
+              -31.625
+            ],
+            [
+              116.745,
+              -31.625
+            ],
+            [
+              116.745,
+              -31.615
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "merredin",
+        "name": "Paddock near Merredin",
+        "region": "Eastern Wheatbelt, WA",
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              118.295,
+              -31.475
+            ],
+            [
+              118.305,
+              -31.475
+            ],
+            [
+              118.305,
+              -31.485
+            ],
+            [
+              118.295,
+              -31.485
+            ],
+            [
+              118.295,
+              -31.475
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "dalby",
+        "name": "Paddock near Dalby",
+        "region": "Darling Downs, QLD",
+        "current_rotation": [
+          "wheat",
+          "canola",
+          "wheat",
+          "wheat"
+        ],
+        "soil_organic_carbon_pct": null,
+        "soil_clay_pct": null,
+        "soil_awc_mm": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.195,
+              -27.195
+            ],
+            [
+              151.205,
+              -27.195
+            ],
+            [
+              151.205,
+              -27.205
+            ],
+            [
+              151.195,
+              -27.205
+            ],
+            [
+              151.195,
+              -27.195
+            ]
+          ]
+        ]
+      }
     }
   ]
 }

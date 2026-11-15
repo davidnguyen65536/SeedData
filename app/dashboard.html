@@ -24,6 +24,7 @@
     <div class="glass-tabs" role="tablist" aria-label="Dashboard sections">
       <span class="lens" aria-hidden="true"><span class="lens-body"></span></span>
       <button role="tab" id="tab-options" aria-controls="panel-options" data-tab="options" aria-selected="true">Options</button>
+      <button role="tab" id="tab-story" aria-controls="panel-story" data-tab="story" aria-selected="false" tabindex="-1">Story</button>
       <button role="tab" id="tab-paddock" aria-controls="panel-paddock" data-tab="paddock" aria-selected="false" tabindex="-1">Paddock</button>
       <button role="tab" id="tab-data" aria-controls="panel-data" data-tab="data" aria-selected="false" tabindex="-1">Data</button>
       <button role="tab" id="tab-how" aria-controls="panel-how" data-tab="how" aria-selected="false" tabindex="-1">How it works</button>
@@ -58,8 +59,38 @@
       </aside>
       <div class="results">
         <div class="paddock-change" role="status" hidden></div>
-        <p class="cards-help">Each rotation gets a score out of 5 for every goal; the big number blends them using what matters to you. Higher is better.</p>
+        <p class="cards-help">Each rotation gets a score out of 5 for every goal; the big number blends them using what matters to you. Higher is better. <a href="?tab=story" data-tab-link="story">Read the paddock's story</a> · <a href="?tab=how" data-tab-link="how">Words we use</a></p>
         <div id="cards" class="cards"></div>
+      </div>
+    </section>
+
+    <!-- Story: the paddock's decade in five chapters, with an optional AI narrator -->
+    <section class="tabpanel story" id="panel-story" role="tabpanel" aria-labelledby="tab-story">
+      <div class="panel story-head">
+        <div>
+          <h2>The story of <span id="story-name">this paddock</span></h2>
+          <p class="muted">Ten years of NASA Earth observations, told in five short chapters. Every number comes from the <a href="?tab=data" data-tab-link="data">Data tab</a>.</p>
+        </div>
+        <div class="story-controls">
+          <label class="tone">Narrator voice
+            <select id="story-tone">
+              <option value="farmer">Farmer: practical</option>
+              <option value="public">General public: plain English</option>
+              <option value="judge">Judges: evidence first</option>
+              <option value="story">Storyteller: documentary</option>
+            </select>
+          </label>
+          <button type="button" class="ai-btn" id="story-ai">Write it with AI</button>
+          <button type="button" class="link-btn" id="story-plain" hidden>Back to plain facts</button>
+        </div>
+        <p class="muted story-status" id="story-status" role="status"></p>
+      </div>
+      <ol class="chapters" id="story-chapters"></ol>
+      <div class="panel story-end">
+        <h3>Before you decide</h3>
+        <ul id="story-checks"></ul>
+        <p class="muted">These are indicative scores from public data, not field trials. Walk the paddock and talk it through with your local agronomist before you change anything.</p>
+        <p class="muted" id="story-meta"></p>
       </div>
     </section>
 
@@ -71,6 +102,8 @@
         <div class="paddock-list" id="paddock-list"></div>
         <div class="paddock-change" role="status" hidden></div>
         <div id="map" aria-label="Map of pilot paddocks"></div>
+        <p class="map-hint">Twelve pilot paddocks across Australia's grain belt. <b>Tap anywhere else on the map</b> to analyse that spot with live NASA data.</p>
+        <p class="live-status" id="live-status" role="status" hidden></p>
       </div>
       <div class="panel" id="paddock-panel">
         <h2 id="paddock-name">Pick a paddock on the map</h2>
@@ -96,7 +129,7 @@
       </div>
       <div class="panel">
         <h2>Data sources</h2>
-        <p>NASA POWER (daily weather and soil wetness) and MODIS MOD13Q1 NDVI greenness via ORNL DAAC, with optional SMAP soil moisture and SRTM slope via NASA AppEEARS, SILO rainfall, and the Soil and Landscape Grid of Australia. Map © OpenStreetMap contributors.</p>
+        <p>NASA POWER (daily weather and soil wetness) and MODIS MOD13Q1 NDVI greenness via ORNL DAAC for twelve pilot paddocks in New South Wales, Victoria, South Australia, Western Australia and Queensland, 2016–2025. Spots you pick on the map use NASA POWER fetched live. Optional: SMAP soil moisture and SRTM slope via NASA AppEEARS, SILO rainfall, and the Soil and Landscape Grid of Australia. Map © OpenStreetMap contributors.</p>
         <p class="muted" id="data-stamp"></p>
       </div>
     </section>
@@ -110,8 +143,15 @@
           <li><b>Summarise.</b> Frost days at flowering, hot days at grain fill, growing-season rain and how much it varies, heavy-rain days, months the paddock is bare.</li>
           <li><b>Score.</b> Simple, published rules score each rotation from 0 to 5 for each goal, weighted by how much each goal matters to you. See the methodology in the project repository.</li>
           <li><b>Explain.</b> Every number in an explanation comes from a numbered fact with its source. An AI model can write the wording, but a checker rejects any number that isn't one of the facts.</li>
+          <li><b>Tell the story.</b> The Story tab turns the same facts into five short chapters, written by fixed rules or, if you choose, by an AI narrator in the voice you pick. The same number check applies.</li>
+          <li><b>Anywhere.</b> Tap any spot on the map and the app fetches ten years of NASA POWER data for it live, so any farm can be scored, not just the pilots.</li>
         </ol>
         <p class="muted">Seed Data supports your judgment and local agronomic advice; it does not replace them. Scores are indicative, not field trial results.</p>
+      </div>
+      <div class="panel glossary-panel" id="words">
+        <h2>Words we use</h2>
+        <p class="muted">Plain meanings for the farming and satellite words on this page. Dotted words elsewhere show these when you hover or tap them.</p>
+        <dl class="glossary" id="glossary"></dl>
       </div>
     </section>
   </main>

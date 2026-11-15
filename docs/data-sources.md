@@ -4,8 +4,8 @@
 
 | Dataset | What we use | Access | Link |
 | --- | --- | --- | --- |
-| NASA POWER (daily, Agroclimatology community) | `T2M_MAX`, `T2M_MIN`, `PRECTOTCORR`, `ALLSKY_SFC_SW_DWN`, `GWETTOP`, `GWETROOT`, 2016–2025 | API, no login | https://power.larc.nasa.gov/ |
-| MODIS Terra Vegetation Indices MOD13Q1 v061 (250 m, 16-day) | `250m_16_days_NDVI` at each paddock centre, 2016–2025 | ORNL DAAC MODIS web service, no login | https://modis.ornl.gov/data/modis_webservice.html |
+| NASA POWER (daily, Agroclimatology community) | `T2M_MAX`, `T2M_MIN`, `PRECTOTCORR`, `ALLSKY_SFC_SW_DWN`, `GWETTOP`, `GWETROOT`, 2016–2025, for twelve pilot paddocks and, live in the browser, for any spot the user taps | API, no login | https://power.larc.nasa.gov/ |
+| MODIS Terra Vegetation Indices MOD13Q1 v061 (250 m, 16-day) | `250m_16_days_NDVI` at each paddock centre, 2016–2025 (four Riverina paddocks loaded; the other eight on the next pipeline run) | ORNL DAAC MODIS web service, no login | https://modis.ornl.gov/data/modis_webservice.html |
 
 ## Optional (pipelines included; need a free login or email)
 

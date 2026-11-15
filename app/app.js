@@ -3,6 +3,9 @@
 
 import { PRIORITIES, evaluate, gapsFor } from './scoring.js';
 import { factsFor, templateExplanation, verifyAndFill } from './explain.js';
+import { CHAPTERS, storyFacts, templateStory, yearBars } from './story.js';
+import { GLOSSARY, define } from './glossary.js';
+import { liveLocation } from './live.js';
 
 const state = {
   data: null,
@@ -13,6 +16,7 @@ const state = {
   currentRotation: null,
   results: [],
   layers: {},
+  aiStory: null,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -21,7 +25,9 @@ const has = (v) => v !== null && v !== undefined && !Number.isNaN(v);
 const MONTHS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 // Each paddock gets its own colour, so a switch is easy to see.
 const PADDOCK_COLORS = ['#c9962b', '#2b8a99', '#b5523b', '#6a58b8', '#4f8a3a', '#c2577e'];
-const colorOf = (p) => PADDOCK_COLORS[state.data.paddocks.indexOf(p) % PADDOCK_COLORS.length];
+const colorOf = (p) => (p.live ? '#1d2a1f' : PADDOCK_COLORS[state.data.paddocks.indexOf(p) % PADDOCK_COLORS.length]);
+// A farming or satellite word with its plain meaning on hover, focus or tap (see glossary.js).
+const term = (text, key) => (define(key) ? `<span class="term" tabindex="0" data-def="${esc(define(key))}">${esc(text)}</span>` : esc(text));
 
 async function init() {
   const [data, crops] = await Promise.all([
@@ -34,6 +40,8 @@ async function init() {
   buildSliders();
   $('livestock').addEventListener('change', (e) => { state.hasLivestock = e.target.checked; render(); });
   buildMap();
+  buildGlossary();
+  setupStory();
   const fromHash = data.paddocks.find((p) => `#${p.id}` === location.hash);
   selectPaddock(fromHash || data.paddocks[0]);
 }
@@ -47,12 +55,16 @@ const HINTS = {
   income: 'Favours selling into more markets',
 };
 const BALANCED = { water: 3, soil: 3, risk: 3, income: 3 };
+const HINT_HTML = {
+  soil: `Favours ${term('legumes', 'legume')}, ${term('pasture', 'pasture')} and ground cover`,
+  risk: `Less exposure to ${term('frost', 'frost')}, heat, ${term('erosion', 'erosion')} and ${term('disease', 'crownrot')}`,
+};
 
 function buildSliders() {
   $('sliders').innerHTML = PRIORITIES.map((p) => `
     <fieldset class="prio">
       <legend>${p.label}</legend>
-      <p class="hint-line">${HINTS[p.id] || ''}</p>
+      <p class="hint-line">${HINT_HTML[p.id] || HINTS[p.id] || ''}</p>
       <div class="seg">${LEVELS.map((l) => `
         <label><input type="radio" name="w-${p.id}" value="${l.v}" data-id="${p.id}" ${state.weights[p.id] === l.v ? 'checked' : ''}><span>${l.label}</span></label>`).join('')}
       </div>
@@ -70,8 +82,22 @@ function buildMap() {
     maxZoom: 18,
     attribution: '&copy; OpenStreetMap contributors',
   }).addTo(map);
-  map.fitBounds(state.data.paddocks.map((p) => p.center), { padding: [40, 40] });
-  for (const p of state.data.paddocks) {
+  // Leaflet's default credit adds a flag icon; keep a plain "Leaflet" credit and the required OpenStreetMap credit.
+  map.attributionControl.setPrefix('<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">Leaflet</a>');
+  map.fitBounds(state.data.paddocks.map((p) => p.center), { padding: [30, 30] });
+  map.on('click', (e) => {
+    const { lat, lng } = e.latlng;
+    const pop = L.popup({ className: 'live-pop' }).setLatLng(e.latlng)
+      .setContent(`<p><b>Analyse this spot?</b><br>Ten years of NASA POWER data, fetched live.</p><button type="button" class="live-go">Analyse with NASA data</button>`)
+      .openOn(map);
+    pop.getElement()?.querySelector('.live-go')?.addEventListener('click', () => { map.closePopup(); analyseSpot(lat, lng); });
+  });
+  for (const p of state.data.paddocks) addPaddockLayer(map, p);
+  state.map = map;
+}
+
+function addPaddockLayer(map, p) {
+  {
     const layer = L.geoJSON(p.geometry, { style: { color: colorOf(p), weight: 3, fillOpacity: 0.25 } })
       .bindTooltip(p.name)
       .on('click', () => selectPaddock(p))
@@ -82,7 +108,27 @@ function buildMap() {
       .addTo(map);
     state.layers[p.id] = { layer, marker };
   }
-  state.map = map;
+}
+
+// Any spot on Earth: fetch NASA POWER live and treat it as one more paddock.
+async function analyseSpot(lat, lng) {
+  const status = $('live-status');
+  status.hidden = false;
+  status.textContent = 'Fetching ten years of NASA POWER data for this spot…';
+  try {
+    const p = await liveLocation(lat, lng);
+    const old = state.data.paddocks.findIndex((x) => x.id === 'custom');
+    if (old >= 0) {
+      state.data.paddocks.splice(old, 1);
+      const l = state.layers.custom; if (l) { state.map.removeLayer(l.layer); state.map.removeLayer(l.marker); }
+    }
+    state.data.paddocks.push(p);
+    addPaddockLayer(state.map, p);
+    status.textContent = `Done: ${p.region}. Greenness and soil aren't loaded for custom spots, so those show as gaps.`;
+    selectPaddock(p);
+  } catch (err) {
+    status.textContent = `Couldn't reach NASA POWER (${err.message}). Try again in a moment.`;
+  }
 }
 
 function selectPaddock(p) {
@@ -179,9 +225,9 @@ function buildRotationSelect() {
   });
 }
 
-function factTile(value, unit, label, source) {
+function factTile(value, unit, label, source, key) {
   if (!has(value)) return '';
-  return `<div class="fact"><div class="v">${esc(value)}<small> ${esc(unit)}</small></div><div class="k">${esc(label)}</div><div class="s">${esc(source)}</div></div>`;
+  return `<div class="fact"><div class="v">${esc(value)}<small> ${esc(unit)}</small></div><div class="k">${key ? term(label, key) : esc(label)}</div><div class="s">${esc(source)}</div></div>`;
 }
 
 function renderPaddock() {
@@ -192,17 +238,17 @@ function renderPaddock() {
   const power = f.years ? `NASA POWER ${f.years}` : 'NASA POWER';
   const modis = f.ndvi_years ? `MODIS ${f.ndvi_years}` : 'MODIS';
   $('paddock-facts').innerHTML = [
-    factTile(f.gs_rain_mm, 'mm', 'Growing-season rain (Apr–Oct), average', power),
+    factTile(f.gs_rain_mm, 'mm', 'Growing-season rain (Apr–Oct), average', power, 'gs'),
     factTile(f.gs_rain_min_mm, 'mm', 'Driest growing season', power),
-    factTile(f.gs_rain_cv_pct, '%', 'Year-to-year rain variation', power),
-    factTile(f.frost_days_aug_oct, 'days', 'Frost days, Aug–Oct (flowering)', power),
-    factTile(f.heat_days_oct_nov, 'days', 'Hot days (32 °C+), Oct–Nov (grain fill)', power),
-    factTile(f.heavy_rain_days, 'days/yr', 'Heavy-rain days (25 mm+)', power),
-    factTile(f.sowing_soil_wetness, 'of 1', 'Topsoil wetness at sowing, Apr–May (1 = soaked)', power),
-    factTile(f.bare_months_per_year, 'months/yr', 'Months with bare ground (greenness under 0.25)', modis),
-    factTile(f.slope_pct, '%', 'Slope', 'SRTM'),
-    factTile(f.smap_sowing_sm, 'm³/m³', 'Soil moisture at sowing', 'SMAP L4'),
-    factTile(f.soil_organic_carbon_pct, '%', 'Soil organic carbon', 'Soil and Landscape Grid'),
+    factTile(f.gs_rain_cv_pct, '%', 'Year-to-year rain variation', power, 'cv'),
+    factTile(f.frost_days_aug_oct, 'days', 'Frost days, Aug–Oct (flowering)', power, 'frost'),
+    factTile(f.heat_days_oct_nov, 'days', 'Hot days (32 °C+), Oct–Nov (grain fill)', power, 'grainfill'),
+    factTile(f.heavy_rain_days, 'days/yr', 'Heavy-rain days (25 mm+)', power, 'heavy'),
+    factTile(f.sowing_soil_wetness, 'of 1', 'Topsoil wetness at sowing, Apr–May (1 = soaked)', power, 'wetness'),
+    factTile(f.bare_months_per_year, 'months/yr', 'Months with bare ground (greenness under 0.25)', modis, 'ndvi'),
+    factTile(f.slope_pct, '%', 'Slope', 'SRTM', 'srtm'),
+    factTile(f.smap_sowing_sm, 'm³/m³', 'Soil moisture at sowing', 'SMAP L4', 'smap'),
+    factTile(f.soil_organic_carbon_pct, '%', 'Soil organic carbon', 'Soil and Landscape Grid', 'oc'),
   ].join('') || '<p class="muted">No data loaded for this paddock yet. Run the pipelines (see README).</p>';
   $('chart-rain').innerHTML = barChart(p.monthly?.rain_mm || []);
   $('chart-ndvi').innerHTML = lineChart(p.ndvi_profile || [], 0.25);
@@ -251,7 +297,8 @@ function render() {
   $('cards').querySelectorAll('.why-btn').forEach((b) => b.addEventListener('click', () => explain(b.dataset.id)));
   liven(before, prev);
   state.shown = Object.fromEntries(results.map((r) => [r.id, { overall: r.overall, scores: { ...r.scores } }]));
-  $('gaps').innerHTML = gapsFor(state.paddock.features || {}).map((g) => `<li>${esc(g)}</li>`).join('');
+  $('gaps').innerHTML = paddockGaps(state.paddock).map((g) => `<li>${esc(g)}</li>`).join('');
+  renderStory();
 }
 
 // Delight, kept quick: cards glide to their new rank, bars grow from their old length and scores count to the new value.
@@ -355,3 +402,95 @@ function lineChart(values, threshold) {
 init().catch((err) => {
   document.querySelector('main').innerHTML = `<div class="panel"><h2>Could not load data</h2><p>${esc(err.message)}</p><p class="muted">If you opened index.html directly, start a local server instead: <code>python -m http.server -d app 8000</code></p></div>`;
 });
+
+// Gaps from the scoring rules, plus notes that depend on where the paddock is.
+function paddockGaps(p) {
+  const out = gapsFor(p.features || {});
+  if (p.center?.[0] > -31) out.unshift('Frost and heat windows (Aug–Oct, Oct–Nov) are set for southern winter cropping; crops in northern NSW and Queensland flower earlier, so check those months locally.');
+  if (p.live) out.unshift('This is a spot you picked: only NASA POWER data is loaded, fetched live. Greenness, slope and soil are not.');
+  return out;
+}
+
+// ---------- Words we use ----------
+function buildGlossary() {
+  const el = $('glossary');
+  if (!el) return;
+  el.innerHTML = GLOSSARY.map((g) => `<div class="gl-item" id="term-${g.key}"><dt>${esc(g.term)}</dt><dd>${esc(g.def)}</dd></div>`).join('');
+}
+
+// ---------- The paddock's story ----------
+function setupStory() {
+  const ai = $('story-ai'), plain = $('story-plain'), tone = $('story-tone');
+  if (!ai) return;
+  ai.addEventListener('click', () => writeStoryWithAI());
+  plain.addEventListener('click', () => { state.aiStory = null; renderStory(); });
+  tone.addEventListener('change', () => { if (state.aiStory) writeStoryWithAI(); });
+}
+
+const storyKey = () => JSON.stringify([state.paddock?.id, state.weights, state.hasLivestock, state.currentRotation, $('story-tone')?.value]);
+
+function renderStory() {
+  const box = $('story-chapters');
+  if (!box || !state.paddock || !state.results.length) return;
+  const p = state.paddock;
+  const story = storyFacts(p, state.results);
+  const plainText = templateStory(p, story);
+  const ai = state.aiStory && state.aiStory.key === storyKey() ? state.aiStory : null;
+  if (state.aiStory && !ai) $('story-status').textContent = 'Your settings changed, so the story is back to plain facts. Press "Write it with AI" for a new version.';
+  $('story-name').textContent = p.live ? 'your chosen spot' : p.name.replace(/^Paddock near /, '');
+  $('story-plain').hidden = !ai;
+  $('story-ai').textContent = ai ? 'Rewrite with AI' : 'Write it with AI';
+  const y = p.yearly || {};
+  const markOf = (vals, pick) => { if (!vals?.length) return []; const ok = vals.filter(has); return [vals.indexOf(pick(...ok))]; };
+  const crop = (id) => state.crops.crops[id]?.label || id;
+  const ranked = [...state.results].sort((a, b) => b.overall - a.overall);
+  const figures = {
+    place: `<figcaption>Average rain by month (mm)</figcaption>${barChart(p.monthly?.rain_mm || [])}`,
+    seasons: `<figcaption>Growing-season rain, April–October, each year (mm). Driest and wettest highlighted.</figcaption>${yearBars(y.year, y.gs_rain_mm, { unit: 'mm', mark: [...markOf(y.gs_rain_mm, Math.min), ...markOf(y.gs_rain_mm, Math.max)], label: 'Growing-season rain by year' })}`,
+    frost: `<figcaption>Frost days in August–October, each year. Worst year highlighted.</figcaption>${yearBars(y.year, y.frost_days, { unit: 'days', mark: markOf(y.frost_days, Math.max), label: 'Frost days at flowering by year' })}`,
+    cover: `<figcaption>Average greenness (NDVI) by month; bare below 0.25</figcaption>${p.ndvi_profile?.length ? lineChart(p.ndvi_profile, 0.25) : '<p class="muted">Not loaded yet.</p>'}`,
+    rotation: `<figcaption>Overall score for your goals (out of 5)</figcaption><div class="mini-rank">${ranked.map((r) => `<div class="mr ${r.id === 'current' ? 'now' : ''}"><span>${esc(r.label)}<small>${r.rotation.map(crop).map(esc).join(' → ')}</small></span><span class="mr-track"><span style="width:${(r.overall / 5) * 100}%"></span></span><b>${r.overall.toFixed(1)}</b></div>`).join('')}</div>`,
+  };
+  box.innerHTML = CHAPTERS.map((c, i) => {
+    const text = ai?.paras?.[i] ?? verifyAndFill(plainText[c.id], story.facts).text;
+    return `<li class="chapter" style="--i:${i}">
+      <div class="ch-text"><span class="ch-num">${i + 1}</span><h3>${esc(c.title)}</h3><p>${esc(text)}</p></div>
+      <figure class="ch-fig">${figures[c.id]}</figure></li>`;
+  }).join('');
+  const best = story.best;
+  $('story-checks').innerHTML = [...best.risks, ...paddockGaps(p).slice(0, 3)].map((x) => `<li>${esc(x)}</li>`).join('');
+  $('story-meta').textContent = ai
+    ? `Narrated by ${ai.model}. Every number was checked against the facts on the Data tab before it was shown.`
+    : 'Written from the facts by fixed rules. Every number comes from the Data tab.';
+}
+
+async function writeStoryWithAI() {
+  const status = $('story-status'), btn = $('story-ai');
+  const p = state.paddock;
+  const story = storyFacts(p, state.results);
+  const key = storyKey();
+  btn.disabled = true;
+  status.textContent = 'Writing the story with AI…';
+  try {
+    const resp = await fetch('/api/explain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'story', tone: $('story-tone').value, paddock: p.live ? 'your chosen spot' : p.name, chapters: CHAPTERS.map((c) => c.title), facts: story.facts.map(({ key: _k, ...f }) => f) }),
+    });
+    if (resp.status === 501) throw new Error('the AI narrator is not switched on for this site yet (no API key)');
+    if (!resp.ok) throw new Error(`the AI service answered ${resp.status}`);
+    const body = await resp.json();
+    const checked = verifyAndFill(body.template || '', story.facts);
+    if (!checked.ok) throw new Error('the AI text failed the number check');
+    const paras = checked.text.split(body.separator || '###').map((x) => x.trim()).filter(Boolean);
+    if (paras.length !== CHAPTERS.length) throw new Error('the AI story came back in the wrong shape');
+    state.aiStory = { key, paras, model: body.model };
+    status.textContent = '';
+  } catch (err) {
+    state.aiStory = null;
+    status.textContent = `Showing plain facts: ${err.message}.`;
+  } finally {
+    btn.disabled = false;
+    renderStory();
+  }
+}

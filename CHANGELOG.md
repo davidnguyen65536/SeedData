@@ -14,6 +14,11 @@ Built during NASA Space Apps Challenge 2026, 14–15 November (Sydney time).
 
 ## 2026-11-15
 
+- Twelve pilot paddocks across NSW, VIC, SA, WA and QLD (was four in the Riverina), with year-by-year growing-season rain, frost and heat series. MODIS greenness for the eight new paddocks comes from the next pipeline run.
+- Tap anywhere on the map to analyse that spot with live NASA POWER data (`app/live.js`).
+- Story tab: the paddock's decade in five chapters with year-by-year charts; optional AI narrator with four voices, every number checked, one automatic retry on the server.
+- Words we use: plain-language glossary in How it works, and dotted terms that show their meaning on hover or tap.
+- Map credit no longer shows Leaflet's flag icon.
 - Dashboard: each paddock has its own colour (menu, list, map and page accent), and switching paddock shows what changed in the options, or says plainly that nothing did. The Data tab uses two columns and How it works shows its four steps side by side.
 - Dashboard: a paddock menu under the title on every tab, and a "Choose a paddock" list beside the map. Charts come alive (rain bars rise, the greenness line draws itself, hover or Tab to a month to read it) and have written descriptions for screen readers; cards glide to their new rank and scores count to their new value when you change a goal. Plainer fact labels, a one-line note on how scores work, card rows aligned across options, glass tabs lined up with the dashboard edge. Screenshots of each feature in `docs/screenshots/`.
 - Dashboard Options tab: priorities are now Off / Low / Medium / High choices with a one-line hint each (same 0–5 weights underneath) and a reset; the livestock box is a switch that says what it changes. Rotation cards are ranked best first, show the change against what you grow now, list the crops as numbered years, emphasise the goals you set High and dim the ones set Off, and fold the risks into "things to check locally". On phones the options come first and the settings follow, with an "Options updated" pill after each change.
