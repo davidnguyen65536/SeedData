@@ -457,7 +457,7 @@ function renderStory() {
     seasons: `${cap('Growing-season rain by year', 'April–October total, mm. Driest and wettest years labelled.')}${yearBars(y.year, y.gs_rain_mm, { unit: 'mm', mark: [...markOf(y.gs_rain_mm, Math.min), ...markOf(y.gs_rain_mm, Math.max)], label: 'Growing-season rain by year' })}`,
     frost: `${cap('Frost days at flowering by year', 'Days at 2 °C or colder, August–October. Worst year labelled.')}${yearBars(y.year, y.frost_days, { unit: 'days', mark: markOf(y.frost_days, Math.max), label: 'Frost days at flowering by year' })}`,
     cover: `${cap('Greenness by month', `Average NDVI from MODIS, ${yrs}0 to 0.9. Below the dashed line (0.25) the ground counts as bare.`)}${p.ndvi_profile?.length ? lineChart(p.ndvi_profile, 0.25) : '<p class="muted">Not loaded yet.</p>'}`,
-    rotation: `${cap('Score for your goals', 'Out of 5, weighted by the goals you set on the Options tab.')}<div class="mini-rank">${ranked.map((r) => `<div class="mr ${r.id === 'current' ? 'now' : ''}"><span>${esc(r.label)}<small>${r.rotation.map(crop).map(esc).join(' → ')}</small></span><span class="mr-track"><span style="width:${(r.overall / 5) * 100}%"></span></span><b>${r.overall.toFixed(1)}</b></div>`).join('')}</div>`,
+    rotation: `${cap('Score for your goals', 'Out of 5, weighted by the goals you set on the Options tab.')}${miniRank()}`,
   };
   box.innerHTML = CHAPTERS.map((c, i) => {
     const text = ai?.paras?.[i] ?? verifyAndFill(plainText[c.id], story.facts).text;
@@ -597,6 +597,42 @@ async function compareWithAI() {
   }
 }
 
+// Rotations ranked for the user's goals, as small bars (Story chapter 5 and Ask).
+function miniRank() {
+  const crop = (id) => state.crops.crops[id]?.label || id;
+  const ranked = [...state.results].sort((a, b) => b.overall - a.overall);
+  return `<div class="mini-rank">${ranked.map((r) => `<div class="mr ${r.id === 'current' ? 'now' : ''}"><span>${esc(r.label)}<small>${r.rotation.map(crop).map(esc).join(' → ')}</small></span><span class="mr-track"><span style="width:${(r.overall / 5) * 100}%"></span></span><b>${r.overall.toFixed(1)}</b></div>`).join('')}</div>`;
+}
+
+// A small chart beside an answer, chosen by what the question is about. Empty when no chart fits.
+const ASK_CHARTS = [
+  { id: 'rain', words: /\b(rain|rainfall|wet|dry|drought|water)/i },
+  { id: 'frost', words: /\b(frost|cold|freez)/i },
+  { id: 'heat', words: /\b(heat|hot|temperature|warm)/i },
+  { id: 'bare', words: /\b(bare|green|ndvi|cover|erosion|ground)/i },
+  { id: 'rotation', words: /\b(best|rotation|grow|crop|score|recommend|should|option|suit)/i },
+];
+function askFigure(question, p) {
+  const y = p.yearly || {}, f = p.features || {};
+  const fig = (title, note, body) => `<figure class="ask-fig"><figcaption><b>${title}</b><span>${note}</span></figcaption>${body}</figure>`;
+  const markOf = (vals) => { const ok = (vals || []).filter(has); return ok.length ? [vals.indexOf(Math.max(...ok))] : []; };
+  for (const t of ASK_CHARTS.filter((x) => x.words.test(question))) {
+    if (t.id === 'rain' && y.gs_rain_mm?.length) {
+      const ok = y.gs_rain_mm.map((v, i) => [v, y.year[i]]).filter(([v]) => has(v));
+      const dry = ok.reduce((a, b) => (b[0] < a[0] ? b : a)), wet = ok.reduce((a, b) => (b[0] > a[0] ? b : a));
+      const cols = [[dry[0], 'Driest', dry[1]], [f.gs_rain_mm, 'Average', f.years || ''], [wet[0], 'Wettest', wet[1]]].filter(([v]) => has(v));
+      const tubes = `<div class="tubes" role="img" aria-label="Growing-season rain: ${cols.map(([v, l, s]) => `${l} ${s}, ${v} mm`).join('; ')}">${cols.map(([v, l, s]) =>
+        `<div class="tube-col"><div class="tube"><span style="height:${Math.max(2, (100 * v) / wet[0]).toFixed(1)}%"></span></div><b>${v} mm</b><small>${esc(l)}<br>${esc(String(s))}</small></div>`).join('')}</div>`;
+      return fig('Growing-season rain', 'April–October total, mm', tubes);
+    }
+    if (t.id === 'frost' && y.frost_days?.length) return fig('Frost days at flowering by year', 'August–October. Worst year labelled.', yearBars(y.year, y.frost_days, { unit: 'days', mark: markOf(y.frost_days), label: 'Frost days at flowering by year' }));
+    if (t.id === 'heat' && y.heat_days?.length) return fig('Hot days at grain fill by year', '32 °C or hotter, October–November. Worst year labelled.', yearBars(y.year, y.heat_days, { unit: 'days', mark: markOf(y.heat_days), label: 'Hot days at grain fill by year' }));
+    if (t.id === 'bare' && p.ndvi_profile?.length) return fig('Greenness by month', 'Average NDVI; below the dashed line (0.25) counts as bare.', lineChart(p.ndvi_profile, 0.25));
+    if (t.id === 'rotation' && state.results.length) return fig('Score for your goals', 'Out of 5, weighted by your goals.', miniRank());
+  }
+  return '';
+}
+
 // ---------- Ask about this paddock ----------
 function setupAsk() {
   const form = $('ask-form');
@@ -610,20 +646,22 @@ async function askPaddock(question) {
   if (!q || !state.paddock) return;
   const out = $('ask-answer'), btn = $('ask-go');
   const story = storyFacts(state.paddock, state.results);
-  const show = (text, meta) => {
+  const show = (text, meta, chart = '') => {
     out.dataset.for = state.paddock.id;
-    out.innerHTML = `<p class="q">${esc(q)}</p><p>${esc(text)}</p><p class="meta">${esc(meta)}</p>`;
+    out.innerHTML = `<div class="ask-text"><p class="q">${esc(q)}</p><p>${esc(text)}</p><p class="meta">${esc(meta)}</p></div>${chart}`;
+    out.classList.toggle('with-fig', !!chart);
   };
   const fallback = (why) => {
     const t = templateAnswer(q, story.facts);
     if (!t) return show("The NASA facts for this paddock can't answer that. Try asking about rain, frost, heat, bare ground, soil wetness at sowing or which rotation suits your goals.", why || 'Answered by fixed rules.');
-    show(verifyAndFill(t, story.facts).text, `Straight from the facts on the Data tab${why ? `. ${why}` : ''}.`);
+    show(verifyAndFill(t, story.facts).text, `Straight from the facts on the Data tab${why ? `. ${why}` : ''}.`, askFigure(q, state.paddock));
   };
   btn.disabled = true;
+  out.classList.remove('with-fig');
   out.innerHTML = '<p class="meta">Looking through the facts…</p>';
   try {
     const r = await askModel({ mode: 'ask', tone: $('story-tone').value, paddock: state.paddock.live ? 'your chosen spot' : state.paddock.name, question: q }, story.facts);
-    show(r.text, `Answered by ${r.model} using only this paddock's facts; every number checked.`);
+    show(r.text, `Answered by ${r.model} using only this paddock's facts; every number checked.`, askFigure(q, state.paddock));
   } catch (err) {
     fallback(err.off ? '' : `AI answer unavailable: ${err.message}`);
   } finally {
