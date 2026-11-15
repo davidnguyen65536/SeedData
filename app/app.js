@@ -751,3 +751,22 @@ function renderSources(p) {
     [gaps, gaps === 1 ? 'thing to check' : 'things to check'],
   ].map(([v, k]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
 }
+
+// Keep a term's definition tip inside the clipped tab area: shift it left near the
+// right edge, and drop it below the term when there is no room above.
+function placeTip(el) {
+  if (!el?.classList?.contains('term')) return;
+  el.style.removeProperty('--tip-x');
+  el.classList.remove('tip-below');
+  const box = (el.closest('.tabpanels') || document.body).getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  const tip = getComputedStyle(el, '::after');
+  const w = parseFloat(tip.width) + parseFloat(tip.paddingLeft) + parseFloat(tip.paddingRight) || 300;
+  const h = parseFloat(tip.height) + parseFloat(tip.paddingTop) + parseFloat(tip.paddingBottom) || 90;
+  const room = Math.min(box.right, window.innerWidth) - 8;
+  const over = r.left + w - room;
+  if (over > 0) el.style.setProperty('--tip-x', `${-Math.min(over, r.left - Math.max(box.left, 0) - 8)}px`);
+  if (r.top - h - 8 < Math.max(box.top, 0)) el.classList.add('tip-below');
+}
+document.addEventListener('pointerover', (e) => placeTip(e.target.closest?.('.term')));
+document.addEventListener('focusin', (e) => placeTip(e.target.closest?.('.term')));

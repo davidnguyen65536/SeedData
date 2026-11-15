@@ -348,8 +348,13 @@ dl.bars { display: grid; gap: 7px; margin: 4px 0 0; }
 .term { position: relative; border-bottom: 1px dotted currentColor; cursor: help; outline: none; }
 .term::after { content: attr(data-def); position: absolute; left: 0; bottom: calc(100% + 8px); z-index: 30; width: max-content; max-width: 280px;
   padding: 8px 10px; border-radius: 8px; background: #1d2a1f; color: #fdfbf5; font-size: 13px; font-weight: 400; line-height: 1.4; text-transform: none; letter-spacing: 0;
-  white-space: normal; box-shadow: 0 6px 18px rgba(0, 0, 0, .18); opacity: 0; transform: translateY(4px); pointer-events: none; transition: opacity .15s, transform .15s; }
-.term:hover::after, .term:focus::after, .term:focus-visible::after { opacity: 1; transform: none; }
+  white-space: normal; box-shadow: 0 6px 18px rgba(0, 0, 0, .18); opacity: 0; transform: translate(var(--tip-x, 0px), 4px); pointer-events: none; transition: opacity .15s, transform .15s; }
+.term:hover::after, .term:focus::after, .term:focus-visible::after { opacity: 1; transform: translate(var(--tip-x, 0px), 0); }
+/* app.js flips the tip below the term when there is no room above it */
+.term.tip-below::after { bottom: auto; top: calc(100% + 8px); transform: translate(var(--tip-x, 0px), -4px); }
+.term.tip-below:hover::after, .term.tip-below:focus::after { transform: translate(var(--tip-x, 0px), 0); }
+/* Cards lift on hover, which gives each its own layer; raise the one holding an open tip so later cards don't paint over it */
+.fact:has(.term:hover, .term:focus), .card:has(.term:hover, .term:focus), .panel:has(.term:hover, .term:focus) { position: relative; z-index: 6; }
 .term:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 2px; }
 .glossary { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin: 12px 0 0; }
 .gl-item { background: var(--bg); border-radius: 10px; padding: 10px 12px; }
