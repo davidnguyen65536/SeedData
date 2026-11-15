@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 12 88 88">
+  <!-- Seed Data mark: a seedling. Always ink: it sits on the light glass bubble in the top nav. -->
+  <style>g { fill: #1c1b17; }</style>
+  <g>
+    <path d="M49 92 C47 78 48 64 51 50 L54 50 C51 64 51 78 53 92 Z"/>
+    <path d="M51 54 C40 54 24 48 18 30 C34 28 48 36 51 54 Z"/>
+    <path d="M53 46 C56 30 68 16 86 14 C84 32 70 44 53 46 Z"/>
+    <ellipse cx="51" cy="93" rx="13" ry="5"/>
+  </g>
+</svg>

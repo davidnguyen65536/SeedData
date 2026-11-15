@@ -99,6 +99,9 @@ p { margin: 0 0 8px; line-height: 1.45; }
 .tabpanel:not(.active) { position: absolute; top: 8px; left: 24px; right: 24px; visibility: hidden; pointer-events: none; }
 .tabpanel.options { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 16px; align-items: start; }
 .tabpanel.paddock { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 16px; align-items: start; }
+.tabpanel.paddock #paddock-panel { grid-column: 2; grid-row: 1; }
+.tabpanel.paddock .map-wide { grid-column: 1 / -1; grid-row: 2; }
+.tabpanel.paddock .map-wide #map { height: 480px; }
 /* Data: the fact table on the left, the limits and sources stacked on the right */
 .tabpanel.data { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 0 16px; align-items: start; }
 .tabpanel.data .data-intro, .tabpanel.data .data-sources { grid-column: 1 / -1; }
@@ -126,6 +129,10 @@ p { margin: 0 0 8px; line-height: 1.45; }
   .tabpanels { padding: 8px 12px 12px; }
   .tabpanel:not(.active) { left: 12px; right: 12px; }
   .tabpanel.options, .tabpanel.paddock { grid-template-columns: 1fr; }
+  .tabpanel.paddock .map-wide { grid-column: auto; grid-row: auto; order: 1; }
+  .tabpanel.paddock #paddock-panel { grid-column: auto; grid-row: auto; order: 2; }
+  .tabpanel.paddock .next-step { order: 3; }
+  .tabpanel.paddock .map-wide #map { height: 360px; }
   /* phones and narrow tablets: the answer first, the settings underneath */
   .tabpanel.options .results { order: 1; }
   .tabpanel.options .settings { order: 2; }

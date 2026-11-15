@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Seed Data – crop rotation choices backed by NASA data</title>
+  <title>Seed Data</title>
   <meta name="description" content="Compare crop rotations for a paddock using NASA Earth observations and Australian data.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
@@ -20,7 +20,7 @@
     </filter>
   </svg>
   <nav class="top-nav" aria-label="Dashboard">
-    <a class="mark" href="index.html"><img src="favicon.svg" alt="" width="22" height="22"><span>Seed Data</span></a>
+    <a class="mark" href="index.html"><img src="mark.svg" alt="" width="22" height="22"><span>Seed Data</span></a>
     <!-- Glass tabs in story order: where, what happened, what to do, the evidence, the method (tabs.js) -->
     <div class="glass-tabs" role="tablist" aria-label="Dashboard sections">
       <span class="lens" aria-hidden="true"><span class="lens-body"></span></span>
@@ -49,6 +49,9 @@
         <p class="muted pick-lead">Pick one below or tap it on the map. Your options update straight away.</p>
         <div class="paddock-list" id="paddock-list"></div>
         <div class="paddock-change" role="status" hidden></div>
+      </div>
+      <!-- The map gets its own full-width row under the list and the paddock panel -->
+      <div class="map-wide">
         <div id="map" aria-label="Map of pilot paddocks"></div>
         <p class="map-hint">Twelve pilot paddocks across Australia's grain belt. <b>Tap anywhere else on the map</b> to analyse that spot with live NASA data.</p>
         <p class="live-status" id="live-status" role="status" hidden></p>
