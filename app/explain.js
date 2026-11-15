@@ -15,11 +15,11 @@ export function factsFor(result, paddock) {
     if (!has(value)) return;
     facts.push({ id: `f${facts.length + 1}`, label, value, unit, source });
   };
-  add('Overall score for your priorities', result.overall, '/5', 'SeedData rules');
-  add('Save water score', result.scores.water, '/5', 'SeedData rules');
-  add('Improve soil score', result.scores.soil, '/5', 'SeedData rules');
-  add('Reduce risk score', result.scores.risk, '/5', 'SeedData rules');
-  add('Extra income score', result.scores.income, '/5', 'SeedData rules');
+  add('Overall score for your priorities', result.overall, '/5', 'Seed Data rules');
+  add('Save water score', result.scores.water, '/5', 'Seed Data rules');
+  add('Improve soil score', result.scores.soil, '/5', 'Seed Data rules');
+  add('Reduce risk score', result.scores.risk, '/5', 'Seed Data rules');
+  add('Extra income score', result.scores.income, '/5', 'Seed Data rules');
   add('Frost days in Aug–Oct, average per year', f.frost_days_aug_oct, 'days', period);
   add('Days of 32 °C or more in Oct–Nov, average per year', f.heat_days_oct_nov, 'days', period);
   add('Growing-season rain (Apr–Oct), average', f.gs_rain_mm, 'mm', period);

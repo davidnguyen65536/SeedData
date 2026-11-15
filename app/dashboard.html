@@ -5,24 +5,73 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SeedData – crop rotation choices backed by NASA data</title>
+  <title>Seed Data – crop rotation choices backed by NASA data</title>
   <meta name="description" content="Compare crop rotations for a paddock using NASA Earth observations and Australian data.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="top">
-    <div>
-      <h1>SeedData</h1>
-      <p class="tag">Compare crop rotations for your paddock, backed by NASA Earth observations</p>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+    <filter id="lens-refract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feImage id="lens-map" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"/>
+      <feDisplacementMap in="SourceGraphic" in2="map" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
+  <nav class="top-nav" aria-label="Dashboard">
+    <!-- Glass tabs: the selected tab sits under a liquid-glass lens (tabs.js) -->
+    <div class="glass-tabs" role="tablist" aria-label="Dashboard sections">
+      <span class="lens" aria-hidden="true"><span class="lens-body"></span></span>
+      <button role="tab" id="tab-options" aria-controls="panel-options" data-tab="options" aria-selected="true">Options</button>
+      <button role="tab" id="tab-paddock" aria-controls="panel-paddock" data-tab="paddock" aria-selected="false" tabindex="-1">Paddock</button>
+      <button role="tab" id="tab-data" aria-controls="panel-data" data-tab="data" aria-selected="false" tabindex="-1">Data</button>
+      <button role="tab" id="tab-how" aria-controls="panel-how" data-tab="how" aria-selected="false" tabindex="-1">How it works</button>
     </div>
-    <a class="about-link" href="#about">How it works</a>
+  </nav>
+  <div class="sheet">
+  <header class="top">
+    <div class="brand">
+      <h1>Seed Data</h1>
+      <p class="tag">Compare crop rotations for your paddock, backed by NASA Earth observations</p>
+      <div class="paddock-switch" id="paddock-switch"></div>
+    </div>
   </header>
 
-  <main class="layout">
-    <section class="left">
-      <div id="map" aria-label="Map of pilot paddocks"></div>
+  <main class="tabpanels">
+    <!-- Options: the answer, with the settings that rank it -->
+    <section class="tabpanel options active" id="panel-options" role="tabpanel" aria-labelledby="tab-options">
+      <aside class="panel settings">
+        <h2>What matters to you?</h2>
+        <p class="muted lead">Choose how much each goal counts. The options re-rank as you go.</p>
+        <div id="sliders" class="sliders"></div>
+        <h3 class="sub">Your farm</h3>
+        <label class="switch">
+          <input type="checkbox" id="livestock" role="switch">
+          <span class="knob" aria-hidden="true"></span>
+          <span class="switch-text"><b>I run sheep or cattle</b><small>Pasture years then count towards income</small></span>
+        </label>
+        <div class="current">
+          <p class="label">What you grow now</p>
+          <div id="current-rotation" class="rot-select"></div>
+        </div>
+      </aside>
+      <div class="results">
+        <div class="paddock-change" role="status" hidden></div>
+        <p class="cards-help">Each rotation gets a score out of 5 for every goal; the big number blends them using what matters to you. Higher is better.</p>
+        <div id="cards" class="cards"></div>
+      </div>
+    </section>
 
+    <!-- Paddock: where it is and what ten years of data say about it -->
+    <section class="tabpanel paddock" id="panel-paddock" role="tabpanel" aria-labelledby="tab-paddock">
+      <div class="map-col">
+        <h2 class="pick-title">Choose a paddock</h2>
+        <p class="muted pick-lead">Pick one below or tap it on the map. Your options update straight away.</p>
+        <div class="paddock-list" id="paddock-list"></div>
+        <div class="paddock-change" role="status" hidden></div>
+        <div id="map" aria-label="Map of pilot paddocks"></div>
+      </div>
       <div class="panel" id="paddock-panel">
         <h2 id="paddock-name">Pick a paddock on the map</h2>
         <p class="muted" id="paddock-sub"></p>
@@ -34,42 +83,46 @@
       </div>
     </section>
 
-    <section class="right">
+    <!-- Data: every number with its source, and the limits -->
+    <section class="tabpanel data" id="panel-data" role="tabpanel" aria-labelledby="tab-data">
       <div class="panel">
-        <h2>What matters to you?</h2>
-        <div id="sliders" class="sliders"></div>
-        <label class="check"><input type="checkbox" id="livestock"> I run sheep or cattle</label>
-        <div class="current">
-          <p class="label">Your current rotation (years 1–4)</p>
-          <div id="current-rotation" class="rot-select"></div>
-        </div>
+        <h2>Every number and where it comes from</h2>
+        <p class="muted">For <span id="data-paddock">this paddock</span>. These are the facts the scores and explanations are built from.</p>
+        <div class="table-wrap"><table class="fact-table" id="fact-table"><thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead><tbody></tbody></table></div>
       </div>
-
-      <div id="cards" class="cards"></div>
-
       <div class="panel" id="gaps-panel">
-        <h3>What the data can't tell you</h3>
+        <h2>What the data can't tell you</h2>
         <ul id="gaps"></ul>
+      </div>
+      <div class="panel">
+        <h2>Data sources</h2>
+        <p>NASA POWER (daily weather and soil wetness) and MODIS MOD13Q1 NDVI greenness via ORNL DAAC, with optional SMAP soil moisture and SRTM slope via NASA AppEEARS, SILO rainfall, and the Soil and Landscape Grid of Australia. Map © OpenStreetMap contributors.</p>
+        <p class="muted" id="data-stamp"></p>
+      </div>
+    </section>
+
+    <!-- How it works: the method, for agronomists and judges -->
+    <section class="tabpanel how" id="panel-how" role="tabpanel" aria-labelledby="tab-how">
+      <div class="panel about" id="about">
+        <h2>How it works</h2>
+        <ol>
+          <li><b>Collect.</b> Ten years (2016–2025) of NASA POWER daily weather and soil wetness, and MODIS NDVI greenness, for each paddock. Optional: SMAP soil moisture and SRTM slope via NASA AppEEARS, SILO rainfall, soil values from the Soil and Landscape Grid of Australia.</li>
+          <li><b>Summarise.</b> Frost days at flowering, hot days at grain fill, growing-season rain and how much it varies, heavy-rain days, months the paddock is bare.</li>
+          <li><b>Score.</b> Simple, published rules score each rotation from 0 to 5 for each goal, weighted by how much each goal matters to you. See the methodology in the project repository.</li>
+          <li><b>Explain.</b> Every number in an explanation comes from a numbered fact with its source. An AI model can write the wording, but a checker rejects any number that isn't one of the facts.</li>
+        </ol>
+        <p class="muted">Seed Data supports your judgment and local agronomic advice; it does not replace them. Scores are indicative, not field trial results.</p>
       </div>
     </section>
   </main>
 
-  <section class="panel about" id="about">
-    <h2>How it works</h2>
-    <ol>
-      <li><b>Collect.</b> Ten years (2016–2025) of NASA POWER daily weather and soil wetness, and MODIS NDVI greenness, for each paddock. Optional: SMAP soil moisture and SRTM slope via NASA AppEEARS, SILO rainfall, soil values from the Soil and Landscape Grid of Australia.</li>
-      <li><b>Summarise.</b> Frost days at flowering, hot days at grain fill, growing-season rain and how much it varies, heavy-rain days, months the paddock is bare.</li>
-      <li><b>Score.</b> Simple, published rules score each rotation from 0 to 5 for each priority, weighted by your sliders. See the methodology in the project repository.</li>
-      <li><b>Explain.</b> Every number in an explanation comes from a numbered fact with its source. An AI model can write the wording, but a checker rejects any number that isn't one of the facts.</li>
-    </ol>
-    <p class="muted">SeedData supports your judgment and local agronomic advice; it does not replace them. Scores are indicative, not field trial results.</p>
-    <p class="muted" id="data-stamp"></p>
-  </section>
-
   <footer class="foot">
     Data: NASA POWER, MODIS MOD13Q1 (via ORNL DAAC), with optional SMAP, SRTM, SILO and Soil and Landscape Grid of Australia. Map © OpenStreetMap contributors.
-    Built for the NASA Space Apps Challenge 2026 (Field Shift). Not affiliated with or endorsed by NASA.<br>© 2026 Team SeedData. All rights reserved.
+    Built for the NASA Space Apps Challenge 2026 (Field Shift). Not affiliated with or endorsed by NASA.<br>© 2026 Team Seed Data. All rights reserved.
   </footer>
+  </div>
+
+  <button type="button" class="reranked" id="reranked" aria-live="polite">Options updated <span aria-hidden="true">↑</span></button>
 
   <dialog id="explain-dialog">
     <form method="dialog">
@@ -86,5 +139,7 @@
 
   <script src="vendor/leaflet/leaflet.js"></script>
   <script type="module" src="app.js"></script>
+  <script type="module" src="tabs.js"></script>
+  <script type="module" src="sky.js"></script>
 </body>
 </html>

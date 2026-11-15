@@ -6,6 +6,8 @@ Static site: no build step. Serve this folder (`python -m http.server 8000 -d ap
 | --- | --- |
 | `index.html`, `landing/` | Front page: the animated farm diorama (see `landing/README.md`) |
 | `dashboard.html`, `styles.css`, `app.js` | The tool at `/dashboard`: page, layout, map (Leaflet) and interaction |
+| `tabs.js` | Glass tabs (Options, Paddock, Data, How it works): one panel at a time, `?tab=` links, the paddock label, the Data tab's fact table and the risk links to the evidence |
+| `sky.js` | The dashboard's animated sky: blue tiles, drifting text-character clouds, and a wind trail that follows the pointer (2D canvas, no libraries; `?debug` exposes `window.__sky`) |
 | `scoring.js` | Scoring rules (see `docs/methodology.md`) |
 | `explain.js` | Numbered facts, rule-based explanation, number checker |
 | `data/paddocks.json` | Built by `pipelines/build_features.py` |
