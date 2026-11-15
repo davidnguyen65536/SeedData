@@ -25,7 +25,7 @@ The dashboard opens with one question: **the seasons are shifting, so which crop
    - Every number grouped by where it comes from (NASA POWER, MODIS and so on), with its period.
    - What the data can't tell you.
    - A card for each data source showing whether it is loaded, fetched live, waiting for the next pipeline run, or optional.
-5. **How it works (the method):** the six steps from data to answer, and a plain-language glossary. Dotted terms elsewhere show their meaning on hover or tap.
+5. **How it works (the method):** the six steps from data to answer, who we are (Team SeedData), and a plain-language glossary. Dotted terms elsewhere show their meaning on hover or tap.
 
 Every number in an explanation, story, comparison or answer comes from a numbered fact. An AI model can write the wording, but a checker rejects any number that isn't one of the facts.
 
@@ -86,10 +86,10 @@ The app is static, so any static host works (GitHub Pages: serve the `app/` fold
 
 | Name               | Role | Contributed |
 | ------------------ | ---- | ----------- |
-| David Nguyen       |      |             |
-| Johanna Josodipuro |      |             |
-| Shaf Tabeeb        |      |             |
 | Andre Baruah       |      |             |
+| Johanna Josodipuro |      |             |
+| David Nguyen       |      |             |
+| Shaf Tabeeb        |      |             |
 
 ## Licence
 

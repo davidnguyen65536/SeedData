@@ -454,3 +454,17 @@ dl.bars { display: grid; gap: 7px; margin: 4px 0 0; }
 .source.optional, .source.off { opacity: .8; }
 @media (max-width: 900px) { .source-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .source-grid { grid-template-columns: 1fr; } }
+
+/* Who we are */
+.team-head { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+.team-head h2 { margin-bottom: 4px; }
+.team-mark { flex: none; fill: var(--green); }
+.team-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.team-list li { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 12px; background: var(--bg); }
+.team-list .avatar { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--green); color: #fff; font-weight: 700; font-size: 16px; }
+.team-list li:nth-child(2) .avatar { background: var(--wheat); }
+.team-list li:nth-child(3) .avatar { background: var(--soil); }
+.team-list li:nth-child(4) .avatar { background: #2b8a99; }
+.team-list .who { font-weight: 600; font-size: 16px; }
+@media (max-width: 900px) { .team-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .team-list { grid-template-columns: 1fr; } }

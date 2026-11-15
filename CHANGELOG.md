@@ -20,6 +20,7 @@ Built during NASA Space Apps Challenge 2026, 14–15 November (Sydney time).
 - Words we use: plain-language glossary in How it works, and dotted terms that show their meaning on hover or tap.
 - Map credit no longer shows Leaflet's flag icon.
 - Dashboard opens with the question ("Which crop rotation suits your paddock now?"). The tabs follow the story in order: Paddock, Story, Options, Data, How it works. They are numbered, and each tab ends with a link to the next. The Seed Data mark sits on the left of the tab bar and the empty sky band is smaller.
+- How it works tab: "Who we are" panel with Team SeedData (Andre Baruah, Johanna Josodipuro, David Nguyen, Shaf Tabeeb, in alphabetical order by surname); team names in the page footer.
 - Data tab redesigned: headline figures, facts grouped by source with their period, highlighted things to check, and a card for each data source showing its status.
 - Story tab: "Listen" reads the story aloud (browser voice, Australian English where available) and "Copy voice-over script" copies it for the demo video.
 - Compare with another paddock: rain, frost, heat and the best rotation side by side, in plain words or written by the AI narrator.
