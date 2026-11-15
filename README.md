@@ -60,7 +60,7 @@ Add or change paddocks in `data/paddocks.geojson` (id, name, current rotation, o
 
 | Path                    | Contents                                                                            |
 | ----------------------- | ----------------------------------------------------------------------------------- |
-| `app/`                  | Static web app: `index.html`, `app.js`, `scoring.js`, `explain.js`, `data/`         |
+| `app/`                  | Static web app: `index.html` (front page), `dashboard.html`, `app.js`, `scoring.js`, `explain.js`, `data/` |
 | `api/explain.js`        | Optional serverless function for AI wording (needs `ANTHROPIC_API_KEY` in the host) |
 | `pipelines/`            | Python data pipelines and their tests                                               |
 | `data/paddocks.geojson` | Pilot paddocks and their current rotation                                           |

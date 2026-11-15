@@ -1,10 +1,11 @@
 # Web app
 
-Static site: no build step. Serve this folder (`python -m http.server 8000 -d app` from the repo root) and open http://localhost:8000.
+Static site: no build step. Serve this folder (`python -m http.server 8000 -d app` from the repo root) and open http://localhost:8000 for the front page, or http://localhost:8000/dashboard.html for the tool.
 
 | File | Purpose |
 | --- | --- |
-| `index.html`, `styles.css`, `app.js` | Page, layout, map (Leaflet) and interaction |
+| `index.html`, `landing/` | Front page: the animated farm diorama (see `landing/README.md`) |
+| `dashboard.html`, `styles.css`, `app.js` | The tool at `/dashboard`: page, layout, map (Leaflet) and interaction |
 | `scoring.js` | Scoring rules (see `docs/methodology.md`) |
 | `explain.js` | Numbered facts, rule-based explanation, number checker |
 | `data/paddocks.json` | Built by `pipelines/build_features.py` |
