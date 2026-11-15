@@ -384,11 +384,16 @@ dl.bars { display: grid; gap: 7px; margin: 4px 0 0; }
 .ch-text p { font-size: 16px; line-height: 1.6; margin: 0; }
 .ch-num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--paddock, var(--green)); color: #fff; font-weight: 700; font-size: 14px; }
 .ch-fig { margin: 0; }
-.ch-fig figcaption { font-size: 12.5px; color: var(--muted); margin-bottom: 6px; }
+.ch-fig figcaption { margin-bottom: 10px; }
+.ch-fig figcaption b { display: block; font-size: 15px; font-weight: 650; color: var(--ink); }
+.ch-fig figcaption span { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
 .year-chart rect { fill: color-mix(in srgb, var(--paddock, var(--wheat)) 45%, #e9e3d4); }
 .year-chart .mark rect { fill: var(--paddock, var(--wheat)); }
 .year-chart text { font-size: 10px; fill: var(--muted); }
-.year-chart .val { font-weight: 700; fill: var(--ink); }
+.year-chart .val { font-weight: 700; fill: var(--ink); opacity: 1; }
+.year-chart .mark text { font-weight: 700; fill: var(--ink); }
+.chart .mo.keep .val { opacity: 1; }
+.chart .bare-label { font-size: 9px; fill: #a3402a; }
 .mini-rank { display: grid; gap: 8px; }
 .mr { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 34px; gap: 10px; align-items: center; font-size: 14px; }
 .mr small { display: block; color: var(--muted); font-size: 12px; }
@@ -475,3 +480,6 @@ dl.bars { display: grid; gap: 7px; margin: 4px 0 0; }
 .team-list .who { font-weight: 600; font-size: 16px; }
 @media (max-width: 900px) { .team-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 480px) { .team-list { grid-template-columns: 1fr; } }
+
+/* The header paddock menu is not needed where the list sits beside it (Paddock) or nothing depends on the paddock (How it works) */
+body[data-tab="paddock"] .paddock-switch, body[data-tab="how"] .paddock-switch { display: none; }

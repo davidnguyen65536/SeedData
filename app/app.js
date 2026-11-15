@@ -372,13 +372,12 @@ function barChart(values) {
   return `<svg class="chart bars-chart" viewBox="0 0 ${w} ${h}" role="group" aria-label="${desc}">
     ${values.map((v, i) => {
       const bh = has(v) ? ((h - pad - top) * v) / max : 0, x = pad + i * bw + 2, y = h - pad - bh;
-      return `<g class="mo" tabindex="0" role="img" aria-label="${MONTH_NAMES[i]}: ${v} mm" style="--i:${i}">
+      return `<g class="mo${i === hi[1] || i === lo[1] ? ' keep' : ''}" tabindex="0" role="img" aria-label="${MONTH_NAMES[i]}: ${v} mm" style="--i:${i}">
         <rect class="hit" x="${pad + i * bw}" y="0" width="${bw}" height="${h - pad}" fill="transparent"/>
         <rect class="rb" x="${x}" y="${y}" width="${bw - 4}" height="${bh}" rx="2"/>
         <text class="val" x="${x + (bw - 4) / 2}" y="${y - 4}" text-anchor="middle">${v}</text>
         <text x="${pad + i * bw + bw / 2}" y="${h - 4}" text-anchor="middle">${MONTHS[i]}</text></g>`;
-    }).join('')}
-    <text x="2" y="${top + 2}">${Math.round(max)}</text></svg>`;
+    }).join('')}</svg>`;
 }
 
 // Greenness: the line draws itself, then the points pop in; hover, tap or Tab to a month to read it.
@@ -394,10 +393,10 @@ function lineChart(values, threshold) {
   const desc = `Average greenness by month. Greenest: ${MONTH_NAMES[hi[1]]}, ${hi[0]}. Least green: ${MONTH_NAMES[lo[1]]}, ${lo[0]}. ${bare ? `${bare} month(s) below the bare line of ${threshold}.` : `Never below the bare line of ${threshold}.`}`;
   return `<svg class="chart line-chart" viewBox="0 0 ${w} ${h}" role="group" aria-label="${desc}">
     <line x1="${pad}" x2="${w - pad}" y1="${y(threshold)}" y2="${y(threshold)}" stroke="#a3402a" stroke-dasharray="4 3"/>
-    <text x="${w - pad}" y="${y(threshold) - 3}" text-anchor="end">bare</text>
+    <text class="bare-label" x="${pad + 2}" y="${y(threshold) + 11}">bare</text>
     <polygon class="area" points="${x(0)},${h - pad} ${pts} ${x(11)},${h - pad}"/>
     <polyline class="ln" points="${pts}" pathLength="1" fill="none" stroke="#2f6b3a" stroke-width="2.5" stroke-linejoin="round"/>
-    ${values.map((v, i) => (has(v) ? `<g class="mo" tabindex="0" role="img" aria-label="${MONTH_NAMES[i]}: ${v}" style="--i:${i}">
+    ${values.map((v, i) => (has(v) ? `<g class="mo${i === hi[1] || i === lo[1] ? ' keep' : ''}" tabindex="0" role="img" aria-label="${MONTH_NAMES[i]}: ${v}" style="--i:${i}">
       <rect class="hit" x="${x(i) - 11}" y="0" width="22" height="${h - pad}" fill="transparent"/>
       <line class="guide" x1="${x(i)}" x2="${x(i)}" y1="${top}" y2="${h - pad}"/>
       <circle class="pt" cx="${x(i)}" cy="${y(v)}" r="3.2"/>
@@ -451,12 +450,14 @@ function renderStory() {
   const markOf = (vals, pick) => { if (!vals?.length) return []; const ok = vals.filter(has); return [vals.indexOf(pick(...ok))]; };
   const crop = (id) => state.crops.crops[id]?.label || id;
   const ranked = [...state.results].sort((a, b) => b.overall - a.overall);
+  const yrs = p.features?.years ? `${p.features.years}, ` : '';
+  const cap = (title, note) => `<figcaption><b>${title}</b><span>${note}</span></figcaption>`;
   const figures = {
-    place: `<figcaption>Average rain by month (mm)</figcaption>${barChart(p.monthly?.rain_mm || [])}`,
-    seasons: `<figcaption>Growing-season rain, April–October, each year (mm). Driest and wettest highlighted.</figcaption>${yearBars(y.year, y.gs_rain_mm, { unit: 'mm', mark: [...markOf(y.gs_rain_mm, Math.min), ...markOf(y.gs_rain_mm, Math.max)], label: 'Growing-season rain by year' })}`,
-    frost: `<figcaption>Frost days in August–October, each year. Worst year highlighted.</figcaption>${yearBars(y.year, y.frost_days, { unit: 'days', mark: markOf(y.frost_days, Math.max), label: 'Frost days at flowering by year' })}`,
-    cover: `<figcaption>Average greenness (NDVI) by month; bare below 0.25</figcaption>${p.ndvi_profile?.length ? lineChart(p.ndvi_profile, 0.25) : '<p class="muted">Not loaded yet.</p>'}`,
-    rotation: `<figcaption>Overall score for your goals (out of 5)</figcaption><div class="mini-rank">${ranked.map((r) => `<div class="mr ${r.id === 'current' ? 'now' : ''}"><span>${esc(r.label)}<small>${r.rotation.map(crop).map(esc).join(' → ')}</small></span><span class="mr-track"><span style="width:${(r.overall / 5) * 100}%"></span></span><b>${r.overall.toFixed(1)}</b></div>`).join('')}</div>`,
+    place: `${cap('Rain by month', `Average ${yrs}mm. Wettest and driest months labelled.`)}${barChart(p.monthly?.rain_mm || [])}`,
+    seasons: `${cap('Growing-season rain by year', 'April–October total, mm. Driest and wettest years labelled.')}${yearBars(y.year, y.gs_rain_mm, { unit: 'mm', mark: [...markOf(y.gs_rain_mm, Math.min), ...markOf(y.gs_rain_mm, Math.max)], label: 'Growing-season rain by year' })}`,
+    frost: `${cap('Frost days at flowering by year', 'Days at 2 °C or colder, August–October. Worst year labelled.')}${yearBars(y.year, y.frost_days, { unit: 'days', mark: markOf(y.frost_days, Math.max), label: 'Frost days at flowering by year' })}`,
+    cover: `${cap('Greenness by month', `Average NDVI from MODIS, ${yrs}0 to 0.9. Below the dashed line (0.25) the ground counts as bare.`)}${p.ndvi_profile?.length ? lineChart(p.ndvi_profile, 0.25) : '<p class="muted">Not loaded yet.</p>'}`,
+    rotation: `${cap('Score for your goals', 'Out of 5, weighted by the goals you set on the Options tab.')}<div class="mini-rank">${ranked.map((r) => `<div class="mr ${r.id === 'current' ? 'now' : ''}"><span>${esc(r.label)}<small>${r.rotation.map(crop).map(esc).join(' → ')}</small></span><span class="mr-track"><span style="width:${(r.overall / 5) * 100}%"></span></span><b>${r.overall.toFixed(1)}</b></div>`).join('')}</div>`,
   };
   box.innerHTML = CHAPTERS.map((c, i) => {
     const text = ai?.paras?.[i] ?? verifyAndFill(plainText[c.id], story.facts).text;
@@ -695,7 +696,7 @@ function renderSources(p) {
     { name: 'SILO', who: 'Queensland Government', what: 'Rain-gauge check on NASA rainfall', grain: 'about 5 km', status: 'optional' },
     { name: 'Soil and Landscape Grid', who: 'CSIRO and TERN', what: 'Soil organic carbon', grain: '90 m', status: has(f.soil_organic_carbon_pct) ? 'ok' : 'optional' },
   ];
-  const LABEL = { ok: 'Loaded', live: 'Fetched live', next: 'Next pipeline run', optional: 'Optional, not loaded', off: 'Not available here' };
+  const LABEL = { ok: 'Loaded', live: 'Fetched live', next: 'Next pipeline run', optional: 'Planned', off: 'Not available here' };
   $('source-grid').innerHTML = SOURCES.map((x) => `
     <article class="source ${x.status}">
       <header><h3>${esc(x.name)}</h3><span class="badge">${LABEL[x.status]}</span></header>
@@ -708,7 +709,7 @@ function renderSources(p) {
   $('data-stats').innerHTML = [
     [f.years || '—', 'years of record'],
     [measures, 'measures'],
-    [`${loaded} of ${SOURCES.length}`, 'data sources loaded'],
+    [loaded, `data sources loaded, ${SOURCES.length - loaded} planned`],
     [gaps, gaps === 1 ? 'thing to check' : 'things to check'],
   ].map(([v, k]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
 }

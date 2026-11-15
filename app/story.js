@@ -100,7 +100,7 @@ export function yearBars(years, values, { unit = '', mark = [], label = '' } = {
       const v = values[i], bh = has(v) ? ((h - padB - top) * v) / max : 0, x = padL + i * bw + 3, yy = h - padB - bh, on = mark.includes(i);
       return `<g class="yb ${on ? 'mark' : ''}" style="--i:${i}"><rect x="${x}" y="${yy}" width="${bw - 6}" height="${bh}" rx="3"/>
         ${on ? `<text class="val" x="${x + (bw - 6) / 2}" y="${yy - 5}" text-anchor="middle">${v}</text>` : ''}
-        <text x="${x + (bw - 6) / 2}" y="${h - 5}" text-anchor="middle">${String(y).slice(2)}</text></g>`;
+        <text x="${x + (bw - 6) / 2}" y="${h - 5}" text-anchor="middle">${y}</text></g>`;
     }).join('')}</svg>`;
 }
 

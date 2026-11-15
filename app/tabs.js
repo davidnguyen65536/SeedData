@@ -63,6 +63,7 @@ function countUp(panel) {
 function select(name, { focus = false, animate = true } = {}) {
   if (!names.includes(name)) name = names[0];
   const tab = tabs[names.indexOf(name)];
+  document.body.dataset.tab = name;
   const from = current ? place(tabs[names.indexOf(current)]) : null, to = place(tab);
   for (const t of tabs) {
     const on = t === tab;
