@@ -15,7 +15,7 @@
 // Environment (set in the hosting dashboard, never in the repo):
 //   ANTHROPIC_API_KEY   required to enable
 //   MODEL               optional, default claude-sonnet-5-5
-//   ALLOWED_ORIGIN      optional, e.g. https://seeddata.vercel.app
+//   ALLOWED_ORIGIN      optional, e.g. https://seed-data-nasa.vercel.app
 
 import { verifyAndFill } from '../app/explain.js';
 
@@ -36,7 +36,19 @@ async function callModel(key, model, prompt, maxTokens) {
   });
   if (!resp.ok) throw Object.assign(new Error('model call failed'), { status: resp.status });
   const body = await resp.json();
-  return (body.content || []).map((c) => c.text || '').join('').trim();
+  const text = (body.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('').trim();
+  return { text, cut: body.stop_reason === 'max_tokens' };
+}
+
+// Checks that go beyond the number check: the answer was not cut off, and has the right number of paragraphs.
+function shapeErrors(answer, parts) {
+  const errors = [];
+  if (answer.cut) errors.push('an answer that was cut off before it finished');
+  if (parts) {
+    const n = answer.text.split(SEP).map((x) => x.trim()).filter(Boolean).length;
+    if (n !== parts) errors.push(`${n} paragraphs instead of exactly ${parts}`);
+  }
+  return errors;
 }
 
 export default async function handler(req, res) {
@@ -59,6 +71,7 @@ export default async function handler(req, res) {
   const voice = TONES[tone] || TONES.farmer;
   const rules = [
     'Use ONLY these facts. Refer to a fact\'s value ONLY by writing its placeholder, e.g. {f6}. Never write any digits yourself, not even years or "five": write years and scores only as placeholders.',
+    'A placeholder is replaced by the value WITH its unit (for example "256 mm" or "48%"), so never write the unit after a placeholder.',
     'Do not promise outcomes or predict yields. Do not use the words "guarantee", "definitely" or "will increase".',
     'Facts (JSON):',
     JSON.stringify(clean),
@@ -73,7 +86,7 @@ export default async function handler(req, res) {
       `Separate paragraphs with a line containing only ${SEP}. Do not write titles or labels.`,
       ...rules,
     ].join('\n');
-    maxTokens = 700;
+    maxTokens = 2000;
   } else if (mode === 'ask') {
     const q = String(question || '').replace(/\s+/g, ' ').slice(0, 200);
     if (!q) return res.status(400).json({ error: 'question required' });
@@ -84,7 +97,7 @@ export default async function handler(req, res) {
       'If the facts do not answer the question, say so in one sentence and name what the facts do cover (rain, frost, heat, bare ground, soil wetness at sowing, rotation scores). Do not guess or use outside knowledge.',
       ...rules,
     ].join('\n');
-    maxTokens = 300;
+    maxTokens = 1000;
   } else if (mode === 'story') {
     const titles = (Array.isArray(chapters) ? chapters : []).slice(0, 6).map((t) => String(t).slice(0, 60));
     prompt = [
@@ -94,26 +107,30 @@ export default async function handler(req, res) {
       'In the last paragraph, explain what the best-scoring rotation offers compared with what is grown now.',
       ...rules,
     ].join('\n');
-    maxTokens = 900;
+    maxTokens = 2500;
   } else {
     prompt = [
       `Explain to an Australian grain farmer, in 3 to 4 short plain-English sentences, how the "${String(strategy).slice(0, 60)}" crop rotation scored on "${String(paddock).slice(0, 60)}". Voice: ${voice}.`,
       'Say it is indicative and end by suggesting they check with their local agronomist.',
       ...rules,
     ].join('\n');
-    maxTokens = 400;
+    maxTokens = 1200;
   }
 
   const model = process.env.MODEL || 'claude-sonnet-5-5';
   try {
-    let template = await callModel(key, model, prompt, maxTokens);
-    let check = verifyAndFill(template, clean);
-    if (!check.ok) {
-      // one retry, telling the model exactly what the checker rejected
-      template = await callModel(key, model, `${prompt}\n\nYour previous answer was rejected because it contained ${check.errors.join(', ')}. Rewrite it following every rule.`, maxTokens);
-      check = verifyAndFill(template, clean);
+    const parts = mode === 'story' || mode === 'compare' ? (Array.isArray(chapters) ? Math.min(chapters.length, mode === 'story' ? 6 : 4) : 0) : 0;
+    let answer = await callModel(key, model, prompt, maxTokens);
+    let check = verifyAndFill(answer.text, clean);
+    let errors = [...check.errors, ...shapeErrors(answer, parts)];
+    if (errors.length) {
+      // one retry, telling the model exactly what the checks rejected
+      answer = await callModel(key, model, `${prompt}\n\nYour previous answer was rejected because it contained ${errors.join(', ')}. Rewrite it following every rule.`, maxTokens);
+      check = verifyAndFill(answer.text, clean);
+      errors = [...check.errors, ...shapeErrors(answer, parts)];
     }
-    if (!check.ok) return res.status(422).json({ error: 'failed checks', errors: check.errors });
+    if (errors.length) return res.status(422).json({ error: 'failed checks', errors });
+    const template = answer.text;
     return res.status(200).json({ template, model, separator: SEP });
   } catch (err) {
     return res.status(502).json({ error: `model call failed${err.status ? ` (${err.status})` : ''}` });

@@ -64,14 +64,34 @@ export function templateExplanation(result, paddock, facts) {
  * no other digits may appear, and no promises about outcomes.
  * Returns {ok, errors, text} with placeholders filled in.
  */
+function dropRepeatedUnits(text, facts) {
+  let out = '', i = 0;
+  for (const m of text.matchAll(/\{(f\d+)\}/g)) {
+    const end = m.index + m[0].length;
+    if (end < i) continue;
+    out += text.slice(i, end);
+    i = end;
+    const unit = String(facts.find((x) => x.id === m[1])?.unit || '').trim();
+    if (!unit) continue;
+    const gap = /^\s*/.exec(text.slice(i))[0].length;
+    const word = text.slice(i + gap, i + gap + unit.length);
+    const after = text.charAt(i + gap + unit.length);
+    if (word.toLowerCase() === unit.toLowerCase() && !/[A-Za-z0-9]/.test(after)) i += gap + unit.length;
+  }
+  return out + text.slice(i);
+}
+
 export function verifyAndFill(text, facts) {
   const errors = [];
   const ids = new Set(facts.map((x) => x.id));
   for (const m of text.matchAll(/\{(f\d+)\}/g)) {
     if (!ids.has(m[1])) errors.push(`unknown fact ${m[1]}`);
   }
+  // A placeholder already carries its unit, so drop a unit written straight after it ("{f2} mm" would read "256 mm mm").
+  text = dropRepeatedUnits(text, facts);
   const stripped = text.replace(/\{f\d+\}/g, '').replace(/Aug–Oct|Oct–Nov|Apr–Oct/g, '');
   if (/\d/.test(stripped)) errors.push('a number that is not from a fact');
+  if (/[{}]/.test(stripped)) errors.push('a broken placeholder');
   if (/\b(guarantee[ds]?|definitely|certainly|will (increase|improve|reduce|boost))\b/i.test(text)) {
     errors.push('a promise about outcomes');
   }

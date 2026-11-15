@@ -139,3 +139,9 @@ test('questions are answered only from facts, or not at all', () => {
   }
   assert.equal(templateAnswer('What will wheat sell for next year?', story.facts), null);
 });
+
+test('a unit written after a placeholder is not doubled, and a cut-off answer fails', () => {
+  const f = [{ id: 'f1', value: 256, unit: 'mm' }, { id: 'f2', value: 48, unit: '%' }, { id: 'f3', value: 13, unit: 'frosty days' }];
+  assert.equal(verifyAndFill('About {f1} mm, {f2}% and {f3} frosty days.', f).text, 'About 256 mm, 48% and 13 frosty days.');
+  assert.ok(!verifyAndFill('The driest was {', f).ok);
+});

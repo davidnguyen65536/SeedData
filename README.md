@@ -7,7 +7,7 @@ SeedData helps Australian grain farmers and their agronomists explore crop rotat
 
 > SeedData supports farmer judgment and local agronomic advice; it does not replace them. Scores are indicative.
 
-**Live demo:** https://seeddata-delta.vercel.app · **Pilot:** twelve dryland paddocks across Australia's grain belt (NSW, VIC, SA, WA, QLD), plus any spot you tap on the map
+**Live demo:** https://seed-data-nasa.vercel.app · **Pilot:** twelve dryland paddocks across Australia's grain belt (NSW, VIC, SA, WA, QLD), plus any spot you tap on the map
 
 ## What it does
 
